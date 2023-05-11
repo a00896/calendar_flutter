@@ -1,8 +1,8 @@
-import 'package:calendar2/screen/achievement_screen.dart';
+import 'package:calendar2/screens/achievement_screen.dart';
 // import 'package:calendar2/screen/event_calendar_screen.dart';
-import 'package:calendar2/screen/home_screen.dart';
-import 'package:calendar2/screen/profile_screen.dart';
-import 'package:calendar2/screen/search_screen.dart';
+import 'package:calendar2/screens/home_screen.dart';
+import 'package:calendar2/screens/profile_screen.dart';
+import 'package:calendar2/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigationBarWidgets extends StatefulWidget {
