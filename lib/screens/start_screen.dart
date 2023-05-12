@@ -33,11 +33,11 @@ class StartScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: GestureDetector(
-            onTap: () => _onLoginTap(context),
-            child: const Row(
+        child: GestureDetector(
+          onTap: () => _onLoginTap(context),
+          child: const Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               mainAxisSize: MainAxisSize.min,
               children: [

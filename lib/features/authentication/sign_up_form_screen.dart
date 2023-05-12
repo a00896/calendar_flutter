@@ -1,26 +1,28 @@
-import 'package:calendar2/features/authentication/sign_up_form_screen.dart';
+import 'package:calendar2/features/authentication/login_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar2/constants/gaps.dart';
 import 'package:calendar2/constants/sizes.dart';
 import 'package:calendar2/features/widgets/form_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class LoginFormScreen extends StatefulWidget {
-  const LoginFormScreen({super.key});
+class SignUpFormScreen extends StatefulWidget {
+  const SignUpFormScreen({super.key});
 
   @override
-  State<LoginFormScreen> createState() => _LoginFormScreenState();
+  State<SignUpFormScreen> createState() => _SignUpFormScreenState();
 }
 
-class _LoginFormScreenState extends State<LoginFormScreen> {
+class _SignUpFormScreenState extends State<SignUpFormScreen> {
   // 고유 식별자 역할, 폼의 state에 접근 가능, 폼의 메서드 실행 가능
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   Map<String, String> formData = {};
-  // String _password = "";
   bool _isValid = true;
   bool _obscureText = true;
+  bool _obscureConfirmText = true;
 
   @override
   void initState() {
@@ -34,11 +36,17 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
         // _password = _passwordController.text;
       });
     });
+    _confirmPasswordController.addListener(() {
+      setState(() {
+        // _password = _passwordController.text;
+      });
+    });
   }
 
   @override
   void dispose() {
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -85,10 +93,10 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
     }
   }
 
-  void _onSignUpTap(BuildContext context) {
+  void _onLoginTap(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const SignUpFormScreen(),
+        builder: (context) => const LoginFormScreen(),
       ),
     );
   }
@@ -97,9 +105,19 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
     _passwordController.clear();
   }
 
+  void _onConfirmClearTap() {
+    _confirmPasswordController.clear();
+  }
+
   void _toggleObscureText() {
     setState(() {
       _obscureText = !_obscureText;
+    });
+  }
+
+  void _toggleObscureConfirmText() {
+    setState(() {
+      _obscureConfirmText = !_obscureConfirmText;
     });
   }
 
@@ -113,7 +131,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
       onTap: _onScaffoldTap,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Log in'),
+          title: const Text('Sign up'),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -136,7 +154,6 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                     ),
                     Gaps.v40,
                     TextFormField(
-                      keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         hintText: 'Email',
                       ),
@@ -191,6 +208,47 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                         }
                       },
                     ),
+                    Gaps.v16,
+                    TextFormField(
+                      controller: _confirmPasswordController,
+                      obscureText: _obscureConfirmText,
+                      decoration: InputDecoration(
+                        hintText: 'Confirm Password',
+                        suffix: Row(
+                          // Row가 모든 TextField의 자리를 차지하는것을 막기위해 최소 크기로 바꿈
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
+                              onTap: _onConfirmClearTap,
+                              child: FaIcon(
+                                FontAwesomeIcons.solidCircleXmark,
+                                color: Colors.grey.shade400,
+                                size: Sizes.size20,
+                              ),
+                            ),
+                            Gaps.h16,
+                            GestureDetector(
+                              onTap: _toggleObscureConfirmText,
+                              child: FaIcon(
+                                _obscureConfirmText
+                                    ? FontAwesomeIcons.eye
+                                    : FontAwesomeIcons.eyeSlash,
+                                color: Colors.grey.shade400,
+                                size: Sizes.size20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      validator: (value) {
+                        return null;
+                      },
+                      onSaved: (newValue) {
+                        if (newValue != null) {
+                          formData['confirmPassword'] = newValue;
+                        }
+                      },
+                    ),
                     Gaps.v28,
                     GestureDetector(
                       onTap: _onSubmitTap,
@@ -205,15 +263,15 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
         ),
         bottomNavigationBar: BottomAppBar(
           child: GestureDetector(
-            onTap: () => _onSignUpTap(context),
+            onTap: () => _onLoginTap(context),
             child: const Padding(
               padding: EdgeInsets.all(20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                // mainAxisSize: MainAxisSize.min,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '회원가입',
+                    '로그인',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
