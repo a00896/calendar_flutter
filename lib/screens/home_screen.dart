@@ -27,8 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
+        Locale('ko', 'KR'),
         Locale('en'),
-        Locale('kr'),
       ],
       home: Scaffold(
         body: content(),
