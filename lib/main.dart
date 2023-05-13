@@ -1,6 +1,8 @@
 import 'package:calendar2/constants/colors.dart';
 import 'package:calendar2/firebase_options.dart';
 import 'package:calendar2/screens/start_screen.dart';
+import 'package:calendar2/widgets/bottonNavigationBar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -70,7 +72,16 @@ class _MainAppState extends State<MainApp> {
         ),
       ),
       // home: const BottomNavigationBarWidgets(),
-      home: const StartScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: ((context, snapshot) {
+          if (snapshot.hasData) {
+            return const BottomNavigationBarWidgets();
+          } else {
+            return const StartScreen();
+          }
+        }),
+      ),
     );
   }
 }

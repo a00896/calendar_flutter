@@ -1,4 +1,6 @@
 import 'package:calendar2/features/authentication/login_form_screen.dart';
+import 'package:calendar2/widgets/bottonNavigationBar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar2/constants/gaps.dart';
 import 'package:calendar2/constants/sizes.dart';
@@ -51,7 +53,16 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
   }
 
   bool _isValidEmailPassword() {
-    _onSubmitTap();
+    if (_formKey.currentState != null) {
+      if (_formKey.currentState!.validate()) {
+        // 모든 field에 onSave(); 실행함
+        _formKey.currentState!.save();
+      }
+    }
+    print("-----------------------------------");
+    print(formData['email'].toString());
+    print(formData['password'].toString());
+
     if (formData['email'].toString().isEmpty ||
         formData['password'].toString().isEmpty) {
       setState(() {
@@ -59,37 +70,59 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
       });
       return false;
     } else {
-      print(formData);
-      // 정규 표현식
-      final regExpEmail = RegExp(
-          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-      final regExpPassword = RegExp(
-          r"^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[@$!%*#?&\^])[A-Za-z0-9@$!%*#?&\^]{8,}$");
+      // print(formData);
+      // // 정규 표현식
+      // final regExpEmail = RegExp(
+      //     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+      // final regExpPassword = RegExp(
+      //     r"^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[@$!%*#?&\^])[A-Za-z0-9@$!%*#?&\^]{8,}$");
 
-      if (regExpEmail.hasMatch(formData['email'].toString())) {
-        if (regExpPassword.hasMatch(formData['password'].toString())) {
-          setState(() {
-            _isValid = true;
-          });
-          return true;
-        }
-      }
+      // if (regExpEmail.hasMatch(formData['email'].toString())) {
+      //   if (regExpPassword.hasMatch(formData['password'].toString())) {
+      //     setState(() {
+      //       _isValid = true;
+      //     });
+      //     return true;
+      //   }
+      // }
 
-      setState(() {
-        _isValid = false;
-      });
-      return false;
+      // setState(() {
+      //   _isValid = false;
+      // });
+      // return false;
     }
+    setState(() {
+      _isValid = true;
+    });
+    return true;
   }
 
-  void _onSubmitTap() {
+  void _onSubmitTap() async {
     if (_formKey.currentState != null) {
       if (_formKey.currentState!.validate()) {
         // 모든 field에 onSave(); 실행함
         _formKey.currentState!.save();
-        // print(formData['email']);
-        // print(formData.values);
       }
+    }
+    try {
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: formData['email'].toString(),
+        password: formData['password'].toString(),
+      );
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const BottomNavigationBarWidgets(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -254,7 +287,7 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
                       onTap: _onSubmitTap,
                       child: FormButton(
                         disabled: !_isValid,
-                        text: '로그인',
+                        text: '회원가입',
                       ),
                     )
                   ],

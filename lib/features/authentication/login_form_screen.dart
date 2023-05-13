@@ -1,4 +1,7 @@
 import 'package:calendar2/features/authentication/sign_up_form_screen.dart';
+import 'package:calendar2/screens/home_screen.dart';
+import 'package:calendar2/widgets/bottonNavigationBar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar2/constants/gaps.dart';
 import 'package:calendar2/constants/sizes.dart';
@@ -43,7 +46,12 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
   }
 
   bool _isValidEmailPassword() {
-    _onSubmitTap();
+    if (_formKey.currentState != null) {
+      if (_formKey.currentState!.validate()) {
+        // 모든 field에 onSave(); 실행함
+        _formKey.currentState!.save();
+      }
+    }
     if (formData['email'].toString().isEmpty ||
         formData['password'].toString().isEmpty) {
       setState(() {
@@ -51,36 +59,56 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
       });
       return false;
     } else {
-      print(formData);
-      // 정규 표현식
-      final regExpEmail = RegExp(
-          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-      final regExpPassword = RegExp(
-          r"^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[@$!%*#?&\^])[A-Za-z0-9@$!%*#?&\^]{8,}$");
+      // print(formData);
+      // // 정규 표현식
+      // final regExpEmail = RegExp(
+      //     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+      // final regExpPassword = RegExp(
+      //     r"^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[@$!%*#?&\^])[A-Za-z0-9@$!%*#?&\^]{8,}$");
 
-      if (regExpEmail.hasMatch(formData['email'].toString())) {
-        if (regExpPassword.hasMatch(formData['password'].toString())) {
-          setState(() {
-            _isValid = true;
-          });
-          return true;
-        }
-      }
+      // if (regExpEmail.hasMatch(formData['email'].toString())) {
+      //   if (regExpPassword.hasMatch(formData['password'].toString())) {
+      //     setState(() {
+      //       _isValid = true;
+      //     });
+      //     return true;
+      //   }
+      // }
 
-      setState(() {
-        _isValid = false;
-      });
-      return false;
+      // setState(() {
+      //   _isValid = false;
+      // });
+      // return false;
     }
+    setState(() {
+      _isValid = true;
+    });
+    return true;
   }
 
-  void _onSubmitTap() {
+  void _onSubmitTap() async {
     if (_formKey.currentState != null) {
       if (_formKey.currentState!.validate()) {
         // 모든 field에 onSave(); 실행함
         _formKey.currentState!.save();
-        // print(formData['email']);
-        // print(formData.values);
+      }
+    }
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: formData['email'].toString(),
+        password: formData['password'].toString(),
+      );
+      print('login');
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const BottomNavigationBarWidgets(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
       }
     }
   }
