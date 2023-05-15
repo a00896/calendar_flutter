@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:calendar2/constants/sizes.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,14 +26,6 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  DateTime today = DateTime.now();
-
-  void _onDaySelected(DateTime day, DateTime focusedDay) {
-    setState(() {
-      today = day;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -71,6 +64,15 @@ class _MainAppState extends State<MainApp> {
           color: Color(0xFFFFF092),
         ),
       ),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('ko', 'KR'),
+        Locale('en'),
+      ],
       // home: const BottomNavigationBarWidgets(),
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),

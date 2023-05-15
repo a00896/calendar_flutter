@@ -1,3 +1,6 @@
+import 'package:calendar2/widgets/profile.dart';
+import 'package:calendar2/widgets/start.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -5,12 +8,14 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Profile'),
-        ),
-      ),
-    );
+    return StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: ((context, snapshot) {
+          if (snapshot.hasData) {
+            return const Profile();
+          } else {
+            return const Start();
+          }
+        }));
   }
 }

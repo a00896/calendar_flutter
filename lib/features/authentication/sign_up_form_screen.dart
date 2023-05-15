@@ -1,5 +1,7 @@
 import 'package:calendar2/features/authentication/login_form_screen.dart';
+import 'package:calendar2/model/user_profile_model.dart';
 import 'package:calendar2/widgets/bottonNavigationBar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar2/constants/gaps.dart';
@@ -20,6 +22,7 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Map<String, String> formData = {};
   bool _isValid = true;
@@ -31,6 +34,12 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
     super.initState();
     setState(() {
       _isValid = _isValidEmailPassword();
+    });
+
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null) {
+        createProfile();
+      }
     });
 
     _passwordController.addListener(() {
@@ -50,6 +59,26 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void createProfile() async {
+    var user = FirebaseAuth.instance.currentUser;
+    if (FirebaseAuth.instance.currentUser != null) {
+      final uid = user!.uid;
+
+      UserProfileModel userModel = UserProfileModel(
+        uid: uid, // user.uid,
+        email: formData['email'].toString(),
+        name: formData['email'].toString(),
+      );
+      await _db.collection("users").doc(uid).set(userModel.toJson());
+
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const BottomNavigationBarWidgets(),
+        ),
+      );
+    }
   }
 
   bool _isValidEmailPassword() {
@@ -97,7 +126,7 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
     return true;
   }
 
-  void _onSubmitTap() async {
+  Future<void> _onSubmitTap() async {
     if (_formKey.currentState != null) {
       if (_formKey.currentState!.validate()) {
         // 모든 field에 onSave(); 실행함
@@ -105,16 +134,12 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
       }
     }
     try {
-      final credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final instance = FirebaseAuth.instance;
+      instance.createUserWithEmailAndPassword(
         email: formData['email'].toString(),
         password: formData['password'].toString(),
       );
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const BottomNavigationBarWidgets(),
-        ),
-      );
+      createProfile();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -187,6 +212,7 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
                     ),
                     Gaps.v40,
                     TextFormField(
+                      keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         hintText: 'Email',
                       ),

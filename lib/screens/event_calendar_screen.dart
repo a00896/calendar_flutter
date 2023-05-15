@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 
@@ -23,7 +24,6 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _selectedDate = _focusedDay;
 
@@ -78,12 +78,21 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
             onPressed: () {
               if (titleController.text.isEmpty &&
                   descpController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Required title and description'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
+                // const SnackBar(
+                //   content: Text('Required title and description'),
+                //   duration: Duration(seconds: 2),
+                // );
+
+                // SnackBar가 안되서 일단 toast msg로 대체
+                Fluttertoast.showToast(
+                    msg: "Required title and description",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.grey,
+                    textColor: Colors.white,
+                    fontSize: 16.0);
+
                 //Navigator.pop(context);
                 return;
               } else {
@@ -132,53 +141,56 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
         centerTitle: true,
         title: const Text('Event Calendar Example'),
       ),
-      body: Column(
-        children: [
-          TableCalendar(
-            firstDay: DateTime(2022),
-            lastDay: DateTime(2023),
-            focusedDay: _focusedDay,
-            calendarFormat: _calendarFormat,
-            onDaySelected: (selectedDay, focusedDay) {
-              if (!isSameDay(_selectedDate, selectedDay)) {
-                // Call `setState()` when updating the selected day
-                setState(() {
-                  _selectedDate = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-              }
-            },
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDate, day);
-            },
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                // Call `setState()` when updating calendar format
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
-            onPageChanged: (focusedDay) {
-              // No need to call `setState()` here
-              _focusedDay = focusedDay;
-            },
-            eventLoader: _listOfDayEvents,
-          ),
-          ..._listOfDayEvents(_selectedDate!).map(
-            (myEvents) => ListTile(
-              leading: const Icon(
-                Icons.done,
-                color: Colors.teal,
-              ),
-              title: Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text('Event Title:   ${myEvents['eventTitle']}'),
-              ),
-              subtitle: Text('Description:   ${myEvents['eventDescp']}'),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            TableCalendar(
+              locale: "ko-KR",
+              firstDay: DateTime.utc(2010, 10, 16),
+              lastDay: DateTime.utc(2030, 3, 14),
+              focusedDay: _focusedDay,
+              calendarFormat: _calendarFormat,
+              onDaySelected: (selectedDay, focusedDay) {
+                if (!isSameDay(_selectedDate, selectedDay)) {
+                  // Call `setState()` when updating the selected day
+                  setState(() {
+                    _selectedDate = selectedDay;
+                    _focusedDay = focusedDay;
+                  });
+                }
+              },
+              selectedDayPredicate: (day) {
+                return isSameDay(_selectedDate, day);
+              },
+              onFormatChanged: (format) {
+                if (_calendarFormat != format) {
+                  // Call `setState()` when updating calendar format
+                  setState(() {
+                    _calendarFormat = format;
+                  });
+                }
+              },
+              onPageChanged: (focusedDay) {
+                // No need to call `setState()` here
+                _focusedDay = focusedDay;
+              },
+              eventLoader: _listOfDayEvents,
             ),
-          ),
-        ],
+            ..._listOfDayEvents(_selectedDate!).map(
+              (myEvents) => ListTile(
+                leading: const Icon(
+                  Icons.done,
+                  color: Colors.teal,
+                ),
+                title: Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text('Event Title:   ${myEvents['eventTitle']}'),
+                ),
+                subtitle: Text('Description:   ${myEvents['eventDescp']}'),
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEventDialog(),
