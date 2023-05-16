@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -9,6 +10,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   DateTime today = DateTime.now();
 
   void _onDaySelected(DateTime day, DateTime focusedDay) {
@@ -21,7 +23,22 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: content(),
+        body: FutureBuilder(
+          future: _initialization,
+          builder: ((context, snapshot) {
+            print(snapshot.connectionState);
+            print(ConnectionState.done);
+            if (snapshot.hasError) {
+              return const Text('error');
+            }
+            if (snapshot.connectionState == ConnectionState.done) {
+              return content();
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }),
+        ),
       ),
     );
   }
