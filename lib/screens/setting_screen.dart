@@ -8,8 +8,11 @@ import 'package:image_picker/image_picker.dart';
 class SettingScreen extends StatelessWidget {
   final ProfileController controller = Get.find<ProfileController>();
 
+  SettingScreen({super.key});
+
   Future<void> _uploadImage(String imagePath) async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final File imageFile = File(pickedFile.path);
       await controller.setImageUrl(imageFile);
@@ -23,7 +26,7 @@ class SettingScreen extends StatelessWidget {
       context: Get.context!, // Use the context from Get
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('닉네임 변경'),
+          title: const Text('닉네임 변경'),
           content: TextField(
             onChanged: (value) {
               newNickname = value;
@@ -31,13 +34,13 @@ class SettingScreen extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              child: Text('취소'),
+              child: const Text('취소'),
               onPressed: () {
                 Navigator.pop(context);
               },
             ),
             TextButton(
-              child: Text('확인'),
+              child: const Text('확인'),
               onPressed: () {
                 controller.updateNickname(newNickname);
                 Navigator.pop(context);
@@ -54,42 +57,42 @@ class SettingScreen extends StatelessWidget {
       top: 0,
       left: 0,
       right: 0,
-      child: Container(
+      child: SizedBox(
         height: 1000,
         child: Column(
           children: [
             profileImage(),
-            SizedBox(height: 100),
+            const SizedBox(height: 100),
             Row(
               children: [
-                Text(
+                const Text(
                   '       Email:',
                   style: TextStyle(fontSize: 18),
                 ),
-                SizedBox(width: 100),
+                const SizedBox(width: 100),
                 Expanded(
                   child: Obx(
                     () => Text(
                       controller.userEmail.value,
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             Container(
               height: 5,
               color: Colors.grey, // Customize color as desired
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
-                Text(
+                const Text(
                   '      닉네임:',
                   style: TextStyle(fontSize: 18),
                 ),
-                SizedBox(width: 100),
+                const SizedBox(width: 100),
                 Expanded(
                   child: GestureDetector(
                     onTap: _showNicknameDialog, // Remove 'context' argument
@@ -98,11 +101,11 @@ class SettingScreen extends StatelessWidget {
                         Obx(
                           () => Text(
                             controller.userName.value,
-                            style: TextStyle(fontSize: 18),
+                            style: const TextStyle(fontSize: 18),
                           ),
                         ),
-                        SizedBox(width: 10),
-                        Icon(
+                        const SizedBox(width: 10),
+                        const Icon(
                           Icons.edit,
                           size: 18,
                         ),
@@ -119,51 +122,54 @@ class SettingScreen extends StatelessWidget {
   }
 
   Widget profileImage() {
-    return Container(
+    return SizedBox(
       width: 130,
       height: 130,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(40),
         child: Stack(
           children: [
-            Obx(() 
-              => Image.network(
+            Obx(
+              () => Image.network(
                 controller.imageUrl.value,
                 fit: BoxFit.cover,
               ),
-           ),
-          controller.isEditMyProfile.value
-          ? Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            child: GestureDetector(
-              onTap: () async {
-                final pickedFile = await ImagePicker().pickImage(
-                source: ImageSource.gallery,
-                );
-                if (pickedFile != null) {
-                  _uploadImage(pickedFile.path);
-                }   
-              },
-              child: Container(
-                alignment: Alignment.bottomRight,
-                  child: Container(
-                    padding: const EdgeInsets.all(7),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: const Icon(
-                      Icons.camera_alt,
-                      size: 25,
-                    ),
-                  ),
-              ),
             ),
-          )
-          : Container(),
+            controller.isEditMyProfile.value
+                ? Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: GestureDetector(
+                      onTap: () async {
+                        final pickedFile = await ImagePicker().pickImage(
+                          source: ImageSource.gallery,
+                        );
+                        if (pickedFile != null) {
+                          _uploadImage(pickedFile.path);
+                        }
+                      },
+                      child: Container(
+                        alignment: Alignment.bottomRight,
+                        child: Container(
+                          padding: const EdgeInsets.all(7),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            size: 25,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(),
+            const SizedBox(
+              height: 300,
+            ),
           ],
         ),
       ),
@@ -174,7 +180,7 @@ class SettingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      title: const Text('설정'),
+        title: const Text('설정'),
       ),
       body: Container(
         child: Stack(

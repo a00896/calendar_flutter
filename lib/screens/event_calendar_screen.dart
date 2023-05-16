@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -19,6 +20,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
 
   Map<String, List> mySelectedEvents = {};
 
+  final collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
   final titleController = TextEditingController();
   final descpController = TextEditingController();
 
@@ -28,6 +30,8 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
     _selectedDate = _focusedDay;
 
     loadPreviousEvents();
+    getCalendarData();
+    print('print: $mySelectedEvents');
   }
 
   loadPreviousEvents() {
@@ -39,6 +43,44 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
       return mySelectedEvents[DateFormat('yyyy-MM-dd').format(dateTime)]!;
     } else {
       return [];
+    }
+  }
+
+  Future<void> getCalendarData() async {
+    try {
+      var response = await FirebaseFirestore.instance
+          .collection(collection_url)
+          // .where('data', isEqualTo: '2023-05-17')
+          .get();
+      for (var result in response.docs) {
+        print('print(data): ${mySelectedEvents[result['date']]}');
+        if (mySelectedEvents[result['date']] != null) {
+          mySelectedEvents[result['date']]?.add({
+            'title': result['title'],
+            'desc': result['desc'],
+          });
+          print('print(mySelectedEvents): $mySelectedEvents');
+        } else {
+          mySelectedEvents[result['date']] = [
+            {
+              'title': result['title'],
+              'desc': result['desc'],
+            }
+          ];
+        }
+        setState(() {});
+
+        print('print mydata: ${mySelectedEvents[result['date']]}');
+      }
+      print('print mydata: $mySelectedEvents');
+
+      // if (response.docs.isNotEmpty) {
+      //   print('print: ${response.docs.length}');
+      // }
+    } on FirebaseException catch (e) {
+      print(e);
+    } catch (error) {
+      print(error);
     }
   }
 
@@ -106,20 +148,26 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                     mySelectedEvents[
                             DateFormat('yyyy-MM-dd').format(_selectedDate!)]
                         ?.add({
-                      "eventTitle": titleController.text,
-                      "eventDescp": descpController.text,
+                      "title": titleController.text,
+                      "desc": descpController.text,
                     });
+                    print('print(mySelectedEvents): $mySelectedEvents');
                   } else {
                     mySelectedEvents[
                         DateFormat('yyyy-MM-dd').format(_selectedDate!)] = [
                       {
-                        "eventTitle": titleController.text,
-                        "eventDescp": descpController.text,
+                        "title": titleController.text,
+                        "desc": descpController.text,
                       }
                     ];
+                    print('print(mySelectedEvents_else): $mySelectedEvents');
                   }
                 });
-
+                FirebaseFirestore.instance.collection(collection_url).add({
+                  "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
+                  "title": titleController.text,
+                  "desc": descpController.text,
+                });
                 print(
                     "New Event for backend developer ${json.encode(mySelectedEvents)}");
                 titleController.clear();
@@ -184,9 +232,9 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                 ),
                 title: Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text('Event Title:   ${myEvents['eventTitle']}'),
+                  child: Text('Event Title:   ${myEvents['title']}'),
                 ),
-                subtitle: Text('Description:   ${myEvents['eventDescp']}'),
+                subtitle: Text('Description:   ${myEvents['desc']}'),
               ),
             ),
           ],

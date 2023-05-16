@@ -1,5 +1,6 @@
 import 'package:calendar2/controller/ProfileController.dart';
 import 'package:calendar2/screens/setting_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -19,7 +20,8 @@ class ProfileScreen extends StatelessWidget {
         children: [
           const ProfileInfoSection(),
           const ProfileImageSection(),
-          SettingButtonSection(controller: controller), // ProfileController 인스턴스 전달
+          SettingButtonSection(
+              controller: controller), // ProfileController 인스턴스 전달
         ],
       ),
     );
@@ -35,7 +37,7 @@ class ProfileInfoSection extends GetWidget<ProfileController> {
       top: 250,
       left: 0,
       right: 230,
-      child: Container(
+      child: SizedBox(
         height: 200,
         child: Column(
           children: [
@@ -58,16 +60,16 @@ class ProfileImageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
+    return const Positioned(
       top: 100,
       left: 0,
       right: 230,
-      child: Container(
+      child: SizedBox(
         height: 200,
         child: Column(
           children: [
-            const ProfileImage(),
-            const SizedBox(height: 20),
+            ProfileImage(),
+            SizedBox(height: 20),
           ],
         ),
       ),
@@ -100,34 +102,52 @@ class ProfileImage extends GetWidget<ProfileController> {
 class SettingButtonSection extends StatelessWidget {
   final ProfileController controller;
 
-  const SettingButtonSection({Key? key, required this.controller}) : super(key: key);
+  const SettingButtonSection({Key? key, required this.controller})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
       top: 100,
       right: 30,
-      child: Container(
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                controller.toggleEditProfile();
-                Get.to(() => SettingScreen());
-              },
-              child: Column(
-                children: const [
-                  Icon(
-                    Icons.settings,
-                    color: Colors.grey,
-                    size: 35,
+      child: Column(
+        children: [
+          Container(
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    controller.toggleEditProfile();
+                    Get.to(() => SettingScreen());
+                  },
+                  child: const Column(
+                    children: [
+                      Icon(
+                        Icons.settings,
+                        color: Colors.grey,
+                        size: 35,
+                      ),
+                      SizedBox(height: 10),
+                    ],
                   ),
-                  SizedBox(height: 10),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          GestureDetector(
+            onTap: () {
+              FirebaseAuth.instance.signOut();
+            },
+            child: Container(
+              width: 300,
+              height: 500,
+              decoration: const BoxDecoration(
+                color: Colors.amber,
+              ),
+              child: const Text("로그아웃"),
+            ),
+          ),
+        ],
       ),
     );
   }

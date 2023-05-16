@@ -70,6 +70,8 @@ class _SignUpFormScreenState extends State<SignUpFormScreen> {
         uid: uid, // user.uid,
         email: formData['email'].toString(),
         name: formData['email'].toString(),
+        imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/calendar-a00896.appspot.com/o/profile_images%2Fprofile_image_BnVeT8npM7RuMyIJC6OtVap6kQA3.jpg?alt=media&token=9970d46c-0e2c-4fe8-a368-3be55684948c",
       );
       await _db.collection("users").doc(uid).set(userModel.toJson());
 
