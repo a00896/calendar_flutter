@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -55,6 +56,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
     } else {
       collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
     }
+
     try {
       var response = await FirebaseFirestore.instance
           .collection(collection_url)
