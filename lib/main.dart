@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import 'package:calendar2/constants/sizes.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +29,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       theme: ThemeData(
         // 모든 scaffold BackgroundColor가 Colors.white로 바뀐다
         scaffoldBackgroundColor: Colors.white,

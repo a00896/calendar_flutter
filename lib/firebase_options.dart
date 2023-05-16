@@ -52,6 +52,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '50781357906',
     projectId: 'calendar-a00896',
     authDomain: 'calendar-a00896.firebaseapp.com',
+    databaseURL: 'https://calendar-a00896-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'calendar-a00896.appspot.com',
   );
 
@@ -60,6 +61,7 @@ class DefaultFirebaseOptions {
     appId: '1:50781357906:android:f35d14f2061241221c9c8b',
     messagingSenderId: '50781357906',
     projectId: 'calendar-a00896',
+    databaseURL: 'https://calendar-a00896-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'calendar-a00896.appspot.com',
   );
 
@@ -68,7 +70,9 @@ class DefaultFirebaseOptions {
     appId: '1:50781357906:ios:14ba55fed20cda5a1c9c8b',
     messagingSenderId: '50781357906',
     projectId: 'calendar-a00896',
+    databaseURL: 'https://calendar-a00896-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'calendar-a00896.appspot.com',
+    androidClientId: '50781357906-ks8l1fljkv6vrg1c6m9ohnaunm444evo.apps.googleusercontent.com',
     iosClientId: '50781357906-8l02iran4076cab8bg2gdt6qihp9vjl5.apps.googleusercontent.com',
     iosBundleId: 'com.example.calendar2',
   );

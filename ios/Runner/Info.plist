@@ -34,6 +34,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>프로필 이미지를 제공할 목적으로 사진첩에 접근 필요</string>
+	<key>NSCameraUsageDescription</key>
+	<string>프로필 이미지를 제공할 목적으로 카메라 접근이 필요</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

@@ -3,6 +3,7 @@ import 'package:calendar2/screens/event_calendar_screen.dart';
 // import 'package:calendar2/screens/search_screen.dart';
 import 'package:calendar2/screens/home_screen.dart';
 import 'package:calendar2/screens/profile_screen.dart';
+import 'package:calendar2/screens/setting_screen.dart';
 import 'package:calendar2/widgets/start.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -25,7 +26,7 @@ class _BottomNavigationBarWidgetsState
     // const SearchScreen(),
     const EventCalendar(),
     // const achievementScreen(),
-    const ProfileScreen()
+    ProfileScreen(),
   ];
   void _onItemTapped(int index) {
     setState(() {
