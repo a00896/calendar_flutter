@@ -1,12 +1,12 @@
-import 'package:calendar2/screens/event_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar2/controller/ProfileController.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 class FriendScreen extends StatelessWidget {
   final ProfileController _profileController = Get.find<ProfileController>();
 
-  FriendScreen({super.key});
+  FriendScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +16,7 @@ class FriendScreen extends StatelessWidget {
       ),
       body: Obx(
         () {
-          final List<Map<String, dynamic>> friends =
-              _profileController.friendData;
+          final List<Map<String, dynamic>> friends = _profileController.friendData;
           if (friends.isEmpty) {
             return const Center(
               child: Text('친구가 없습니다.'),
@@ -30,19 +29,39 @@ class FriendScreen extends StatelessWidget {
                 String friendImageUrl = friends[index]['imageUrl'] ?? '';
 
                 return ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: ((context) =>
-                            EventCalendar(friendUid: friends[index]['uid'])),
-                      ),
-                    );
-                  },
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(friendImageUrl),
                   ),
                   title: Text(friendName),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('친구 삭제'),
+                            content: const Text('정말로 삭제하시겠습니까?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () async {
+                                  await _profileController.deleteFriend(index);
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('예'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('취소'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             );
@@ -66,8 +85,7 @@ class FriendScreen extends StatelessWidget {
                       ),
                     ),
                     Obx(() {
-                      final errorMessage =
-                          _profileController.errorMessage.value;
+                      final errorMessage = _profileController.errorMessage.value;
                       if (errorMessage.isNotEmpty) {
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
@@ -88,8 +106,7 @@ class FriendScreen extends StatelessWidget {
                   TextButton(
                     onPressed: () async {
                       await _profileController.addFriend();
-                      // 이메일이 존재하지 않는 경우에만 팝업 닫지 않음
-                      if (_profileController.errorMessage.isEmpty) {
+                      if (_profileController.errorMessage.value.isEmpty) {
                         Navigator.of(context).pop();
                       }
                     },

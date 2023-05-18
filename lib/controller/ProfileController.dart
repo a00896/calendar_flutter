@@ -13,8 +13,8 @@ class ProfileController extends GetxController {
   var userName = ''.obs;
   var imageUrl = ''.obs;
   var friendData = <Map<String, dynamic>>[].obs;
-  final emailController = TextEditingController(); // 이메일을 입력받을 컨트롤러 추가
-  final RxString errorMessage = ''.obs; // 에러 메시지를 관리하기 위한 RxString 추가
+  final emailController = TextEditingController();
+  final RxString errorMessage = ''.obs;
 
   @override
   void onInit() {
@@ -66,73 +66,127 @@ class ProfileController extends GetxController {
   }
 
   Future<void> addFriend() async {
-    String email = emailController.text.trim();
+  String email = emailController.text.trim();
 
-    if (email.isEmpty) {
-      errorMessage.value = '이메일을 입력해주세요.';
-      return;
-    }
-
-    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .get();
-
-    if (snapshot.docs.isEmpty) {
-      // Firestore에 해당 이메일이 없는 경우
-      errorMessage.value = '해당 이메일이 존재하지 않습니다.';
-      return;
-    }
-
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      String userId = user.uid;
-
-      CollectionReference<Map<String, dynamic>> usersCollection =
-          FirebaseFirestore.instance.collection('users');
-
-      // friends 필드에 userId 추가
-      await usersCollection
-          .doc(snapshot.docs.first.id)
-          .collection('friends')
-          .doc(userId)
-          .set({});
-
-      // 현재 사용자의 friends 필드에 friend의 userId 추가
-      await usersCollection.doc(userId).set({
-        'friends': FieldValue.arrayUnion([snapshot.docs.first.id])
-      }, SetOptions(merge: true));
-
-      // 친구 목록을 다시 가져옴
-      getProfileData();
-    }
-
-    emailController.clear(); // 이메일 필드 초기화
+  if (email.isEmpty) {
+    errorMessage.value = '이메일을 입력해주세요.';
+    return;
   }
 
-  void getProfileData() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot =
-          await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      if (snapshot.exists) {
-        var userData = snapshot.data();
-        List<dynamic> friendIds = userData?['friends'] ?? [];
-        friendData.clear(); // friendData 초기화
+  QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .where('email', isEqualTo: email)
+      .get();
 
-        for (dynamic friendId in friendIds) {
-          DocumentSnapshot<Map<String, dynamic>> friendSnapshot =
-              await FirebaseFirestore.instance.collection('users').doc(friendId).get();
-          if (friendSnapshot.exists) {
-            Map<String, dynamic> friendData = friendSnapshot.data() ?? {};
-            this.friendData.add(friendData); // List에 friendData 추가
+  if (snapshot.docs.isEmpty) {
+    errorMessage.value = '해당 이메일이 존재하지 않습니다.';
+    return;
+  }
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    String userId = user.uid;
+    String friendId = snapshot.docs.first.id;
+
+    if (isFriend(userId, friendId)) {
+      errorMessage.value = '이미 친구입니다.';
+      return;
+    }
+
+    CollectionReference<Map<String, dynamic>> usersCollection =
+        FirebaseFirestore.instance.collection('users');
+
+    // Update the friend data in the user's document
+    await usersCollection.doc(userId).update({
+      'friends': FieldValue.arrayUnion([friendId])
+    });
+
+    // Update the user's data in the friend's document
+    await usersCollection.doc(friendId).update({
+      'friends': FieldValue.arrayUnion([userId])
+    });
+
+    getProfileData();
+  }
+
+  emailController.clear();
+}
+
+
+  Future<void> deleteFriend(int index) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    String userId = user.uid;
+    String friendId = friendData[index]['uid'];
+
+    CollectionReference<Map<String, dynamic>> usersCollection =
+        FirebaseFirestore.instance.collection('users');
+
+    // 사용자의 친구 목록에서 친구 삭제
+    await usersCollection.doc(userId).update({
+      'friends': FieldValue.arrayRemove([friendId])
+    });
+
+    // 친구의 친구 목록에서 사용자 삭제
+    await usersCollection.doc(friendId).update({
+      'friends': FieldValue.arrayRemove([userId])
+    });
+
+    getProfileData();
+  }
+}
+
+
+  void getProfileData() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    if (snapshot.exists) {
+      var userData = snapshot.data();
+      List<dynamic> friendIds = userData?['friends'] ?? [];
+      
+      // Create a temporary map to store friend data
+      Map<String, Map<String, dynamic>> tempFriendData = {};
+
+      for (dynamic friendId in friendIds) {
+        DocumentSnapshot<Map<String, dynamic>> friendSnapshot =
+            await FirebaseFirestore.instance.collection('users').doc(friendId).get();
+        if (friendSnapshot.exists) {
+          Map<String, dynamic> friend = friendSnapshot.data()!;
+          friend['uid'] = friendId;
+
+          // Check if the friend data already exists in the temporary map
+          if (!tempFriendData.containsKey(friendId)) {
+            tempFriendData[friendId] = friend;
           }
         }
+      }
 
-        userEmail.value = userData?['email'] ?? '';
-        userName.value = userData?['name'] ?? '';
-        imageUrl.value = userData?['imageUrl'] ?? '';
+      // Clear the existing friendData list
+      friendData.clear();
+
+      // Add unique friends from the temporary map to the friendData list
+      friendData.addAll(tempFriendData.values);
+
+      userName.value = userData?['name'] ?? '';
+      imageUrl.value = userData?['imageUrl'] ?? '';
+    }
+  }
+}
+
+  bool isFriend(String userId, String friendId) {
+    for (Map<String, dynamic> friend in friendData) {
+      if (friend['uid'] == friendId) {
+        return true;
       }
     }
+    return false;
+  }
+
+  @override
+  void onClose() {
+    emailController.dispose();
+    super.onClose();
   }
 }
