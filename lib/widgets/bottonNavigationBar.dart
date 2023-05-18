@@ -1,16 +1,13 @@
-import 'package:calendar2/screens/event_calendar.dart';
 import 'package:calendar2/screens/event_calendar_screen.dart';
 // import 'package:calendar2/screens/search_screen.dart';
-import 'package:calendar2/screens/home_screen.dart';
 import 'package:calendar2/screens/profile_screen.dart';
-import 'package:calendar2/screens/setting_screen.dart';
+import 'package:calendar2/screens/search_query.dart';
 import 'package:calendar2/widgets/start.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 
 import '../screens/friend_screens.dart';
-import '../screens/search_screen.dart';
 
 class BottomNavigationBarWidgets extends StatefulWidget {
   const BottomNavigationBarWidgets({super.key});
@@ -24,12 +21,12 @@ class _BottomNavigationBarWidgetsState
     extends State<BottomNavigationBarWidgets> {
   int _selectedIndex = 0;
   static final List<Widget> _widgetOptions = <Widget>[
-
     // const HomeScreen(),
     const EventCalendarScreen(),
     // const SearchScreen(),
     FriendScreen(),
-    const EventCalendar(),
+    // const EventCalendar(),
+    const SearchQuery(),
     // const achievementScreen(),
     ProfileScreen(),
   ];
