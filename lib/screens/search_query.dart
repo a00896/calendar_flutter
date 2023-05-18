@@ -55,7 +55,6 @@ class _SearchQueryState extends State<SearchQuery> {
                       if (name.isEmpty) {
                         return ListTile(
                           onTap: () {
-                            print('print: test');
                             Navigator.push(
                               context,
                               MaterialPageRoute(

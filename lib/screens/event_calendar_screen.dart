@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -20,9 +22,10 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
 
   Map<String, List> mySelectedEvents = {};
 
-  final collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2';
   final titleController = TextEditingController();
   final descpController = TextEditingController();
+  var collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
+  var user_name = 'Every Calendar';
 
   @override
   void initState() {
@@ -30,8 +33,8 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
     _selectedDate = _focusedDay;
 
     loadPreviousEvents();
+    getUserData();
     getCalendarData();
-    print('print: $mySelectedEvents');
   }
 
   loadPreviousEvents() {
@@ -46,20 +49,40 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
     }
   }
 
+  Future<void> getUserData() async {
+    print('print: getUserData');
+    var user = FirebaseAuth.instance.currentUser;
+    var users = FirebaseFirestore.instance.collection('users');
+    if (FirebaseAuth.instance.currentUser != null) {
+      final uid = user!.uid;
+      var documentSnapshot = await users.doc(uid).get();
+      print(documentSnapshot.data());
+    } else {
+      collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
+    }
+  }
+
   Future<void> getCalendarData() async {
+    var user = FirebaseAuth.instance.currentUser;
+    if (FirebaseAuth.instance.currentUser != null) {
+      final uid = user!.uid;
+      collection_url = 'users/$uid/calendars';
+    } else {
+      collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
+    }
+
     try {
       var response = await FirebaseFirestore.instance
           .collection(collection_url)
           // .where('data', isEqualTo: '2023-05-17')
           .get();
       for (var result in response.docs) {
-        print('print(data): ${mySelectedEvents[result['date']]}');
         if (mySelectedEvents[result['date']] != null) {
           mySelectedEvents[result['date']]?.add({
             'title': result['title'],
             'desc': result['desc'],
           });
-          print('print(mySelectedEvents): $mySelectedEvents');
+          // print('print(mySelectedEvents): $mySelectedEvents');
         } else {
           mySelectedEvents[result['date']] = [
             {
@@ -69,10 +92,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
           ];
         }
         setState(() {});
-
-        print('print mydata: ${mySelectedEvents[result['date']]}');
       }
-      print('print mydata: $mySelectedEvents');
 
       // if (response.docs.isNotEmpty) {
       //   print('print: ${response.docs.length}');
@@ -151,7 +171,6 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                       "title": titleController.text,
                       "desc": descpController.text,
                     });
-                    print('print(mySelectedEvents): $mySelectedEvents');
                   } else {
                     mySelectedEvents[
                         DateFormat('yyyy-MM-dd').format(_selectedDate!)] = [
@@ -160,7 +179,6 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                         "desc": descpController.text,
                       }
                     ];
-                    print('print(mySelectedEvents_else): $mySelectedEvents');
                   }
                 });
                 FirebaseFirestore.instance.collection(collection_url).add({
@@ -186,58 +204,64 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.white,
+        elevation: 0,
         centerTitle: true,
-        title: const Text('Event Calendar Example'),
+        // title: const Text(user_name),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TableCalendar(
-              locale: "ko-KR",
-              firstDay: DateTime.utc(2010, 10, 16),
-              lastDay: DateTime.utc(2030, 3, 14),
-              focusedDay: _focusedDay,
-              calendarFormat: _calendarFormat,
-              onDaySelected: (selectedDay, focusedDay) {
-                if (!isSameDay(_selectedDate, selectedDay)) {
-                  // Call `setState()` when updating the selected day
-                  setState(() {
-                    _selectedDate = selectedDay;
-                    _focusedDay = focusedDay;
-                  });
-                }
-              },
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDate, day);
-              },
-              onFormatChanged: (format) {
-                if (_calendarFormat != format) {
-                  // Call `setState()` when updating calendar format
-                  setState(() {
-                    _calendarFormat = format;
-                  });
-                }
-              },
-              onPageChanged: (focusedDay) {
-                // No need to call `setState()` here
-                _focusedDay = focusedDay;
-              },
-              eventLoader: _listOfDayEvents,
-            ),
-            ..._listOfDayEvents(_selectedDate!).map(
-              (myEvents) => ListTile(
-                leading: const Icon(
-                  Icons.done,
-                  color: Colors.teal,
-                ),
-                title: Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text('Event Title:   ${myEvents['title']}'),
-                ),
-                subtitle: Text('Description:   ${myEvents['desc']}'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          child: Column(
+            children: [
+              TableCalendar(
+                locale: "ko-KR",
+                firstDay: DateTime.utc(2010, 10, 16),
+                lastDay: DateTime.utc(2030, 3, 14),
+                focusedDay: _focusedDay,
+                calendarFormat: _calendarFormat,
+                onDaySelected: (selectedDay, focusedDay) {
+                  if (!isSameDay(_selectedDate, selectedDay)) {
+                    // Call `setState()` when updating the selected day
+                    setState(() {
+                      _selectedDate = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  }
+                },
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDate, day);
+                },
+                onFormatChanged: (format) {
+                  if (_calendarFormat != format) {
+                    // Call `setState()` when updating calendar format
+                    setState(() {
+                      _calendarFormat = format;
+                    });
+                  }
+                },
+                onPageChanged: (focusedDay) {
+                  // No need to call `setState()` here
+                  _focusedDay = focusedDay;
+                },
+                eventLoader: _listOfDayEvents,
               ),
-            ),
-          ],
+              ..._listOfDayEvents(_selectedDate!).map(
+                (myEvents) => ListTile(
+                  leading: const Icon(
+                    Icons.done,
+                    color: Colors.teal,
+                  ),
+                  title: Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text('Event Title:   ${myEvents['title']}'),
+                  ),
+                  subtitle: Text('Description:   ${myEvents['desc']}'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(

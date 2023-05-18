@@ -1,22 +1,25 @@
+import 'package:calendar2/screens/event_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar2/controller/ProfileController.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 class FriendScreen extends StatelessWidget {
   final ProfileController _profileController = Get.find<ProfileController>();
 
+  FriendScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('친구 목록'),
+        title: const Text('친구 목록'),
       ),
       body: Obx(
         () {
-          final List<Map<String, dynamic>> friends = _profileController.friendData;
-          if (friends == null || friends.isEmpty) {
-            return Center(
+          final List<Map<String, dynamic>> friends =
+              _profileController.friendData;
+          if (friends.isEmpty) {
+            return const Center(
               child: Text('친구가 없습니다.'),
             );
           } else {
@@ -27,6 +30,15 @@ class FriendScreen extends StatelessWidget {
                 String friendImageUrl = friends[index]['imageUrl'] ?? '';
 
                 return ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: ((context) =>
+                            EventCalendar(friendUid: friends[index]['uid'])),
+                      ),
+                    );
+                  },
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(friendImageUrl),
                   ),
@@ -43,30 +55,31 @@ class FriendScreen extends StatelessWidget {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('친구 추가'),
+                title: const Text('친구 추가'),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: _profileController.emailController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: '이메일',
                       ),
                     ),
                     Obx(() {
-                      final errorMessage = _profileController.errorMessage.value;
+                      final errorMessage =
+                          _profileController.errorMessage.value;
                       if (errorMessage.isNotEmpty) {
                         return Padding(
-                          padding: EdgeInsets.only(top: 8.0),
+                          padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
                             errorMessage,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.red,
                             ),
                           ),
                         );
                       } else {
-                        return SizedBox.shrink();
+                        return const SizedBox.shrink();
                       }
                     }),
                   ],
@@ -80,14 +93,14 @@ class FriendScreen extends StatelessWidget {
                         Navigator.of(context).pop();
                       }
                     },
-                    child: Text('추가'),
+                    child: const Text('추가'),
                   ),
                 ],
               );
             },
           );
         },
-        child: Icon(Icons.person_add),
+        child: const Icon(Icons.person_add),
       ),
     );
   }
