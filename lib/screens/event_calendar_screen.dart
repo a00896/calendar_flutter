@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -22,9 +20,9 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
 
   Map<String, List> mySelectedEvents = {};
 
+  final collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
   final titleController = TextEditingController();
   final descpController = TextEditingController();
-  var collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
 
   @override
   void initState() {
@@ -49,14 +47,6 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   }
 
   Future<void> getCalendarData() async {
-    var user = FirebaseAuth.instance.currentUser;
-    if (FirebaseAuth.instance.currentUser != null) {
-      final uid = user!.uid;
-      collection_url = 'users/$uid/calendars';
-    } else {
-      collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
-    }
-
     try {
       var response = await FirebaseFirestore.instance
           .collection(collection_url)
