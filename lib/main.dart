@@ -1,4 +1,5 @@
 import 'package:calendar2/constants/colors.dart';
+import 'package:calendar2/controller/ProfileController.dart';
 import 'package:calendar2/firebase_options.dart';
 import 'package:calendar2/screens/start_screen.dart';
 import 'package:calendar2/widgets/bottonNavigationBar.dart';
@@ -15,27 +16,18 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // initializeDataFormatting().then((_) => runApp(MainApp()));
-  runApp(const MainApp());
+  runApp(MainApp());
 }
 
-class MainApp extends StatefulWidget {
-  const MainApp({super.key});
-
-  @override
-  State<MainApp> createState() => _MainAppState();
-}
-
-class _MainAppState extends State<MainApp> {
+class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Get.put(ProfileController());
+
     return GetMaterialApp(
       theme: ThemeData(
-        // 모든 scaffold BackgroundColor가 Colors.white로 바뀐다
         scaffoldBackgroundColor: Colors.white,
         primaryColor: primaryColor,
-
-        // 모든 App Bar 글자색, 배경색 변경, titleTextStyle 변경
         appBarTheme: const AppBarTheme(
           foregroundColor: Colors.black,
           backgroundColor: Colors.white,
@@ -52,9 +44,7 @@ class _MainAppState extends State<MainApp> {
         ),
         textTheme: const TextTheme(
           displayLarge: TextStyle(
-            color: Color(
-              0xFF232B55,
-            ),
+            color: Color(0xFF232B55),
           ),
         ),
         bottomAppBarTheme: const BottomAppBarTheme(
@@ -74,16 +64,15 @@ class _MainAppState extends State<MainApp> {
         Locale('ko', 'KR'),
         Locale('en'),
       ],
-      // home: const BottomNavigationBarWidgets(),
-      home: StreamBuilder(
+      home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
-        builder: ((context, snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.hasData) {
             return const BottomNavigationBarWidgets();
           } else {
             return const StartScreen();
           }
-        }),
+        },
       ),
     );
   }

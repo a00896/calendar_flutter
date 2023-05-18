@@ -9,6 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 
+import '../screens/friend_screens.dart';
+import '../screens/search_screen.dart';
+
 class BottomNavigationBarWidgets extends StatefulWidget {
   const BottomNavigationBarWidgets({super.key});
 
@@ -21,9 +24,11 @@ class _BottomNavigationBarWidgetsState
     extends State<BottomNavigationBarWidgets> {
   int _selectedIndex = 0;
   static final List<Widget> _widgetOptions = <Widget>[
-    const HomeScreen(),
+
+    // const HomeScreen(),
     const EventCalendarScreen(),
     // const SearchScreen(),
+    FriendScreen(),
     const EventCalendar(),
     // const achievementScreen(),
     ProfileScreen(),

@@ -20,7 +20,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
 
   Map<String, List> mySelectedEvents = {};
 
-  final collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
+  final collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2';
   final titleController = TextEditingController();
   final descpController = TextEditingController();
 
