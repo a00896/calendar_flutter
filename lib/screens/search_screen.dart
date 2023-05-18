@@ -5,7 +5,7 @@ import '../constants/colors.dart';
 import '../widgets/todo_item.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  const SearchScreen({super.key, required Map<String, dynamic> friend});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();

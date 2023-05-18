@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:calendar2/screens/event_calendar.dart';
 import 'package:calendar2/controller/ProfileController.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 class FriendScreen extends StatelessWidget {
@@ -13,6 +13,24 @@ class FriendScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('친구 목록'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return SimpleDialog(
+                    title: const Text('알림'),
+                    children: [
+                      ListTile( ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: Obx(
         () {
@@ -29,6 +47,15 @@ class FriendScreen extends StatelessWidget {
                 String friendImageUrl = friends[index]['imageUrl'] ?? '';
 
                 return ListTile(
+                   onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: ((context) =>
+                            EventCalendar(friendUid: friends[index]['uid'])),
+                      ),
+                    );
+                  },
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(friendImageUrl),
                   ),
