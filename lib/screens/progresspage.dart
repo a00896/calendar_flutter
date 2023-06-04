@@ -12,9 +12,17 @@ class _ProgressPageState extends State<ProgressPage> {
     ProgressData(name: 'Graph 3', progress: 0.5),
   ];
 
-  void addProgress(ProgressData progressData) {
+  void addProgressData(ProgressData progressData) {
     setState(() {
       progressList.add(progressData);
+    });
+  }
+
+  void removeProgressData() {
+    setState(() {
+      if (progressList.isNotEmpty) {
+        progressList.removeLast();
+      }
     });
   }
 
@@ -34,22 +42,30 @@ class _ProgressPageState extends State<ProgressPage> {
             ),
             SizedBox(height: 20),
 
-            for (ProgressData progressData in progressList)
+            for (int i = 0; i < progressList.length; i++) // 수정
               Column(
                 children: [
                   Text(
-                    progressData.name,
+                    progressList[i].name,
                     style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(height: 5),
-                  ProgressBar(progress: progressData.progress),
+                  ProgressBar(progress: progressList[i].progress),
                   SizedBox(height: 10),
                 ],
               ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => addProgress(ProgressData(name: 'New Graph', progress: 0.7)), // 새로운 진행도와 이름을 추가
+              onPressed: () {
+                addProgressData(ProgressData(name: 'New Graph', progress: 0.7));
+              },
               child: Text('Add Progress'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                removeProgressData();
+              },
+              child: Text('Remove Progress'),
             ),
           ],
         ),
