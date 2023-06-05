@@ -1,7 +1,7 @@
 import 'package:calendar2/screens/event_calendar_screen.dart';
 // import 'package:calendar2/screens/search_screen.dart';
 import 'package:calendar2/screens/profile_screen.dart';
-import 'package:calendar2/screens/search_query.dart';
+import 'package:calendar2/screens/progresspage.dart';
 import 'package:calendar2/widgets/start.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -26,7 +26,8 @@ class _BottomNavigationBarWidgetsState
     // const SearchScreen(),
     FriendScreen(),
     // const EventCalendar(),
-    const SearchQuery(),
+    // const SearchQuery(),
+    ProgressPage(),
     // const achievementScreen(),
     ProfileScreen(),
   ];

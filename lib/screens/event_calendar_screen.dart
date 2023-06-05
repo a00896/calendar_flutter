@@ -25,16 +25,25 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   final titleController = TextEditingController();
   final descpController = TextEditingController();
   var collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
+  var calendar_url;
   var user_name = 'Every Calendar';
 
   @override
   void initState() {
     super.initState();
     _selectedDate = _focusedDay;
+    print("print: initState");
 
     loadPreviousEvents();
     getUserData();
     getCalendarData();
+  }
+
+  @override
+  void dispose() {
+    saveCalendarData();
+    print("print: dispose");
+    super.dispose(); // 마지막에 선언 / 차이는 없는데 보기좋음
   }
 
   loadPreviousEvents() {
@@ -67,6 +76,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
     if (FirebaseAuth.instance.currentUser != null) {
       final uid = user!.uid;
       collection_url = 'users/$uid/calendars';
+      calendar_url = 'users/$uid';
     } else {
       collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
     }
@@ -81,13 +91,16 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
           mySelectedEvents[result['date']]?.add({
             'title': result['title'],
             'desc': result['desc'],
+            'isChecked': result['isChecked'],
+            'document': result['document'],
           });
-          // print('print(mySelectedEvents): $mySelectedEvents');
         } else {
           mySelectedEvents[result['date']] = [
             {
               'title': result['title'],
               'desc': result['desc'],
+              'isChecked': result['isChecked'],
+              'document': result['document'],
             }
           ];
         }
@@ -97,6 +110,50 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
       // if (response.docs.isNotEmpty) {
       //   print('print: ${response.docs.length}');
       // }
+    } on FirebaseException catch (e) {
+      print(e);
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future<void> saveCalendarData() async {
+    var user = FirebaseAuth.instance.currentUser;
+    final uid = user!.uid;
+    await FirebaseFirestore.instance.collection("users").doc(uid).update(
+      {
+        "calendars": '',
+      },
+    );
+
+    var response = await FirebaseFirestore.instance
+        .collection(collection_url)
+        // .where('data', isEqualTo: '2023-05-17')
+        .get();
+    try {
+      mySelectedEvents.forEach((key, value) {
+        // print("print $key, $value");
+        // print("print: ${value[0]["title"]}");
+        for (var v in value) {
+          // print("print: $key");
+          print("print v: $v");
+          // print("print v: ${v["title"]}");
+          var document = v["document"];
+
+          // FirebaseFirestore.instance
+          //     .collection(collection_url)
+          //     .doc(document)
+          //     .update({
+          //   "isChecked": v["isChecked"],
+          // });
+          // FirebaseFirestore.instance.collection(collection_url).add({
+          //   "date": key,
+          //   "title": v["title"],
+          //   "desc": v["desc"],
+          //   "isChecked": v["isChecked"],
+          // });
+        }
+      });
     } on FirebaseException catch (e) {
       print(e);
     } catch (error) {
@@ -158,9 +215,6 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                 //Navigator.pop(context);
                 return;
               } else {
-                print(titleController.text);
-                print(descpController.text);
-
                 setState(() {
                   if (mySelectedEvents[
                           DateFormat('yyyy-MM-dd').format(_selectedDate!)] !=
@@ -170,6 +224,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                         ?.add({
                       "title": titleController.text,
                       "desc": descpController.text,
+                      "isChecked": false,
                     });
                   } else {
                     mySelectedEvents[
@@ -177,6 +232,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                       {
                         "title": titleController.text,
                         "desc": descpController.text,
+                        "isChecked": false,
                       }
                     ];
                   }
@@ -185,6 +241,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                   "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
                   "title": titleController.text,
                   "desc": descpController.text,
+                  "isChecked": false,
                 });
                 print(
                     "New Event for backend developer ${json.encode(mySelectedEvents)}");
@@ -195,6 +252,43 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
               }
             },
           )
+        ],
+      ),
+    );
+  }
+
+  _deleteEventDialog() {
+    print("print: 삭제버튼 탭");
+    print(
+        'print1: ${mySelectedEvents[DateFormat('yyyy-MM-dd').format(_selectedDate!)]!.where((element) => element["title"] == "asdf")}');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          '일정 삭제',
+          textAlign: TextAlign.center,
+        ),
+        content: const Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "삭제하시겠습니까?",
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            child: const Text('삭제'),
+            onPressed: () => Navigator.pop(context),
+          ),
         ],
       ),
     );
@@ -249,8 +343,16 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
               ),
               ..._listOfDayEvents(_selectedDate!).map(
                 (myEvents) => ListTile(
-                  leading: const Icon(
-                    Icons.done,
+                  onTap: () => {
+                    print("print: 리스트타일 탭"),
+                    setState(() {
+                      myEvents['isChecked'] = !myEvents['isChecked'];
+                    })
+                  },
+                  leading: Icon(
+                    myEvents['isChecked']
+                        ? Icons.check_box
+                        : Icons.check_box_outline_blank,
                     color: Colors.teal,
                   ),
                   title: Padding(
@@ -258,6 +360,13 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                     child: Text('Event Title:   ${myEvents['title']}'),
                   ),
                   subtitle: Text('Description:   ${myEvents['desc']}'),
+                  trailing: IconButton(
+                    onPressed: _deleteEventDialog,
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  ),
                 ),
               ),
             ],
