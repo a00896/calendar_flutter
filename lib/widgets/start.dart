@@ -2,6 +2,7 @@ import 'package:calendar2/constants/gaps.dart';
 import 'package:calendar2/features/authentication/login_form_screen.dart';
 import 'package:flutter/material.dart';
 
+//1111
 class Start extends StatelessWidget {
   const Start({super.key});
 
@@ -28,6 +29,10 @@ class Start extends StatelessWidget {
                 fontSize: 64,
                 fontWeight: FontWeight.w600,
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Image.asset('assets/images/main_todo.png'),
             ),
           ],
         ),

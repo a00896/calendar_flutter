@@ -29,15 +29,31 @@ class _SearchQueryState extends State<SearchQuery> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Card(
-          child: TextField(
-            decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search), hintText: 'Search...'),
-            onChanged: (val) {
-              setState(() {
-                name = val;
-              });
-            },
+        backgroundColor: Color.fromARGB(255, 248, 248, 248),
+        foregroundColor: Color.fromARGB(255, 165, 202, 243),
+        title: Text('every calendar'), // 페이지 이름을 여기에 추가하세요.
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(60.0),
+          child: Card(
+            margin: EdgeInsets.all(10.0),
+            child: TextField(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color.fromARGB(255, 223, 223, 223),
+                prefixIcon: Icon(Icons.search),
+                hintText: '닉네임을 입력하세요...',
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none, // TextField의 경계선을 제거
+                ),
+              ),
+              onChanged: (val) {
+                setState(() {
+                  name = val;
+                });
+              },
+            ),
           ),
         ),
       ),
@@ -68,7 +84,7 @@ class _SearchQueryState extends State<SearchQuery> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              color: Colors.black,
+                              color: Color.fromARGB(255, 83, 83, 83),
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -78,7 +94,7 @@ class _SearchQueryState extends State<SearchQuery> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              color: Colors.black,
+                              color: Color.fromARGB(255, 71, 71, 71),
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,7 +15,7 @@ class EventCalendarScreen extends StatefulWidget {
 }
 
 class _EventCalendarScreenState extends State<EventCalendarScreen> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDate;
 
@@ -25,25 +24,16 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   final titleController = TextEditingController();
   final descpController = TextEditingController();
   var collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
-  var calendar_url;
   var user_name = 'Every Calendar';
 
   @override
   void initState() {
     super.initState();
     _selectedDate = _focusedDay;
-    print("print: initState");
 
     loadPreviousEvents();
     getUserData();
     getCalendarData();
-  }
-
-  @override
-  void dispose() {
-    saveCalendarData();
-    print("print: dispose");
-    super.dispose(); // 마지막에 선언 / 차이는 없는데 보기좋음
   }
 
   loadPreviousEvents() {
@@ -76,7 +66,6 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
     if (FirebaseAuth.instance.currentUser != null) {
       final uid = user!.uid;
       collection_url = 'users/$uid/calendars';
-      calendar_url = 'users/$uid';
     } else {
       collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
     }
@@ -86,21 +75,19 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
           .collection(collection_url)
           // .where('data', isEqualTo: '2023-05-17')
           .get();
+
       for (var result in response.docs) {
         if (mySelectedEvents[result['date']] != null) {
           mySelectedEvents[result['date']]?.add({
             'title': result['title'],
             'desc': result['desc'],
-            'isChecked': result['isChecked'],
-            'document': result['document'],
           });
+          // print('print(mySelectedEvents): $mySelectedEvents');
         } else {
           mySelectedEvents[result['date']] = [
             {
               'title': result['title'],
               'desc': result['desc'],
-              'isChecked': result['isChecked'],
-              'document': result['document'],
             }
           ];
         }
@@ -110,72 +97,6 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
       // if (response.docs.isNotEmpty) {
       //   print('print: ${response.docs.length}');
       // }
-    } on FirebaseException catch (e) {
-      print(e);
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  Future<void> saveCalendarData() async {
-    var user = FirebaseAuth.instance.currentUser;
-    final uid = user!.uid;
-    await FirebaseFirestore.instance.collection("users").doc(uid).update(
-      {
-        "calendars": '',
-      },
-    );
-
-    var response = await FirebaseFirestore.instance
-        .collection(collection_url)
-        // .where('data', isEqualTo: '2023-05-17')
-        .get();
-    try {
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      print('print:-------------------------------------------------------');
-      // print('print query: ${await firestore.collection(collection_url).get()}');
-      QuerySnapshot querySnapshot = await firestore
-          .collection(collection_url)
-          // .where('title', isEqualTo: 'Fg')
-          .get();
-      // print("print docs: ${querySnapshot.docs}");
-
-      if (querySnapshot.docs.isNotEmpty) {
-        for (var doc in querySnapshot.docs) {
-          print('print id: ${doc.id}');
-
-          mySelectedEvents.forEach((key, value) {
-            // print("print $key, $value");
-            // print("print: ${value[0]["title"]}");
-            for (var v in value) {
-              // print("print: $key");
-              // print("print v: $v");
-              // print("print v: ${v["title"]}");
-              print("print document: ${v["document"]}");
-              if (doc.id == v["document"]) {
-                print('print: true');
-                FirebaseFirestore.instance
-                    .collection(collection_url)
-                    .doc(v["document"])
-                    .update({
-                  "isChecked": v["isChecked"],
-                });
-                // FirebaseFirestore.instance.collection(collection_url).add({
-                //   "date": key,
-                //   "title": v["title"],
-                //   "desc": v["desc"],
-                //   "isChecked": v["isChecked"],
-                // });
-              }
-            }
-          });
-        }
-        // 검색 결과에서 첫 번째 문서의 ID를 가져옴
-        String documentID = querySnapshot.docs[0].id;
-        print('print 문서 ID: $documentID');
-      } else {
-        print('print 해당하는 문서를 찾을 수 없음');
-      }
     } on FirebaseException catch (e) {
       print(e);
     } catch (error) {
@@ -237,9 +158,9 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                 //Navigator.pop(context);
                 return;
               } else {
-                DateTime dt = DateTime.now();
-                String timestamp = dt.millisecondsSinceEpoch.toString();
-                print(timestamp);
+                /*print(titleController.text);
+                print(descpController.text);*/
+
                 setState(() {
                   if (mySelectedEvents[
                           DateFormat('yyyy-MM-dd').format(_selectedDate!)] !=
@@ -249,8 +170,6 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                         ?.add({
                       "title": titleController.text,
                       "desc": descpController.text,
-                      "isChecked": false,
-                      "document": timestamp,
                     });
                   } else {
                     mySelectedEvents[
@@ -258,24 +177,17 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                       {
                         "title": titleController.text,
                         "desc": descpController.text,
-                        "isChecked": false,
-                        "document": timestamp,
                       }
                     ];
                   }
                 });
-                FirebaseFirestore.instance
-                    .collection(collection_url)
-                    .doc(timestamp)
-                    .set({
+                FirebaseFirestore.instance.collection(collection_url).add({
                   "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
                   "title": titleController.text,
                   "desc": descpController.text,
-                  "isChecked": false,
-                  "document": timestamp,
                 });
-                print(
-                    "New Event for backend developer ${json.encode(mySelectedEvents)}");
+                /*print(
+                    "New Event for backend developer ${json.encode(mySelectedEvents)}");*/
                 titleController.clear();
                 descpController.clear();
                 Navigator.pop(context);
@@ -288,56 +200,40 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
     );
   }
 
-  _deleteEventDialog() {
-    print("print: 삭제버튼 탭");
-    print(
-        'print1: ${mySelectedEvents[DateFormat('yyyy-MM-dd').format(_selectedDate!)]!.where((element) => element["title"] == "asdf")}');
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          '일정 삭제',
-          textAlign: TextAlign.center,
-        ),
-        content: const Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "삭제하시겠습니까?",
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            child: const Text('삭제'),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-    );
+  // All events completed check
+  bool isAllEventsCompleted(List events) {
+    if (events.isEmpty) {
+      return false;
+    }
+
+    for (var event in events) {
+      if (!(event['isCompleted'] ?? false)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
+    List notCompletedEvents = _listOfDayEvents(_selectedDate!)
+        .where((event) => !(event['isCompleted'] ?? false))
+        .toList();
+    List completedEvents = _listOfDayEvents(_selectedDate!)
+        .where((event) => event['isCompleted'] ?? false)
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Colors.black,
-        backgroundColor: Colors.white,
+        foregroundColor: Color.fromARGB(255, 146, 182, 248),
+        backgroundColor: Color.fromARGB(218, 255, 255, 255),
         elevation: 0,
         centerTitle: true,
-        // title: const Text(user_name),
+        title: const Text('Every calendar'),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
           child: Column(
             children: [
               TableCalendar(
@@ -371,62 +267,85 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                   _focusedDay = focusedDay;
                 },
                 eventLoader: _listOfDayEvents,
-              ),
-              ..._listOfDayEvents(_selectedDate!).map(
-                (myEvents) => ListTile(
-                  onTap: () => {
-                    print("print: 리스트타일 탭"),
-                    setState(() {
-                      myEvents['isChecked'] = !myEvents['isChecked'];
-                    })
+                /*eventLoader: _listOfDayEvents, >>>>>일정 완료 날짜 표시 근데 일정 개수가 사라짐ㅜㅜ
+                calendarBuilders: CalendarBuilders(
+                  markerBuilder: (context, date, events) {
+                    if (events.isNotEmpty) {
+                      if (isAllEventsCompleted(events)) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            color: Colors.green.shade700,
+                          ),
+                          width: 10,
+                          height: 10,
+                        );
+                      } else {
+                        return Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            color: Colors.red.shade700,
+                          ),
+                          width: 10,
+                          height: 10,
+                        );
+                      }
+                    }
+                    return null;
                   },
-                  leading: Icon(
-                    myEvents['isChecked']
-                        ? Icons.check_box
-                        : Icons.check_box_outline_blank,
-                    color: Colors.teal,
-                  ),
-                  title: Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text('Event Title:   ${myEvents['title']}'),
-                  ),
-                  subtitle: Text('Description:   ${myEvents['desc']}'),
-                  trailing: IconButton(
-                    // onPressed: _deleteEventDialog,
-                    onPressed: () {
-                      print("print: 삭제버튼클릭");
-                      print('print: $myEvents');
-                      FirebaseFirestore.instance
-                          .collection(collection_url)
-                          .doc(myEvents['document'])
-                          .delete()
-                          .then(
-                            (doc) => print("Document deleted"),
-                            onError: (e) => print("Error updating document $e"),
-                          );
-                      setState(() {
-                        mySelectedEvents.forEach((key, values) {
-                          print("print remove1: $mySelectedEvents");
-                          values.removeWhere((value) => value == myEvents);
-
-                          print("print remove2: $mySelectedEvents");
-                        });
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.delete,
-                      color: Colors.red,
-                    ),
-                  ),
                 ),
               ),
+              Divider(*/
+              ),
+              Divider(
+                // 구분선 추가
+                color: Colors.grey,
+                thickness: 1, // 원하는 두께를 선택
+              ),
+              ...notCompletedEvents
+                  .map((myEvents) => listItemBuilder(myEvents)),
+              ...completedEvents.map((myEvents) => listItemBuilder(myEvents)),
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEventDialog(),
-        label: const Text('Add Event'),
+        label: const Text('Add Event--'),
+      ),
+    );
+  }
+
+  Widget listItemBuilder(myEvents) {
+    return ListTile(
+      leading: Checkbox(
+        value: myEvents.containsKey('isCompleted')
+            ? myEvents['isCompleted']
+            : false,
+        onChanged: (bool? newValue) {
+          setState(() {
+            myEvents['isCompleted'] = newValue;
+          });
+        },
+      ),
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: Text('to:   ${myEvents['title']}',
+            style: TextStyle(
+              decoration:
+                  myEvents.containsKey('isCompleted') && myEvents['isCompleted']
+                      ? TextDecoration.lineThrough
+                      : null,
+            )),
+      ),
+      subtitle: Text(
+        '설명:   ${myEvents['desc']}',
+        style: TextStyle(
+          decoration:
+              myEvents.containsKey('isCompleted') && myEvents['isCompleted']
+                  ? TextDecoration.lineThrough
+                  : null,
+        ),
       ),
     );
   }

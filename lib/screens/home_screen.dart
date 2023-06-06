@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(
             height: 20,
           ),
-          Text('선택한 날짜 = ${today.toString().split(" ")[0]}'),
+          Text('선택한 날짜 : ${today.toString().split(" ")[0]}'),
           Container(
             child: TableCalendar(
               locale: "ko-KR",

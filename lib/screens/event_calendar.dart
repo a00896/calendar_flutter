@@ -28,25 +28,16 @@ class _EventCalendarState extends State<EventCalendar> {
   final titleController = TextEditingController();
   final descpController = TextEditingController();
   var collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
-  var calendar_url;
   var user_name = 'Every Calendar';
 
   @override
   void initState() {
     super.initState();
     _selectedDate = _focusedDay;
-    print("print: initState");
 
     loadPreviousEvents();
     getUserData();
     getCalendarData();
-  }
-
-  @override
-  void dispose() {
-    saveCalendarData();
-    print("print: dispose");
-    super.dispose(); // 마지막에 선언 / 차이는 없는데 보기좋음
   }
 
   loadPreviousEvents() {
@@ -79,7 +70,6 @@ class _EventCalendarState extends State<EventCalendar> {
     if (FirebaseAuth.instance.currentUser != null) {
       final uid = widget.friendUid;
       collection_url = 'users/$uid/calendars';
-      calendar_url = 'users/$uid';
     } else {
       collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
     }
@@ -94,16 +84,13 @@ class _EventCalendarState extends State<EventCalendar> {
           mySelectedEvents[result['date']]?.add({
             'title': result['title'],
             'desc': result['desc'],
-            'isChecked': result['isChecked'],
-            'document': result['document'],
           });
+          // print('print(mySelectedEvents): $mySelectedEvents');
         } else {
           mySelectedEvents[result['date']] = [
             {
               'title': result['title'],
               'desc': result['desc'],
-              'isChecked': result['isChecked'],
-              'document': result['document'],
             }
           ];
         }
@@ -113,72 +100,6 @@ class _EventCalendarState extends State<EventCalendar> {
       // if (response.docs.isNotEmpty) {
       //   print('print: ${response.docs.length}');
       // }
-    } on FirebaseException catch (e) {
-      print(e);
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  Future<void> saveCalendarData() async {
-    var user = FirebaseAuth.instance.currentUser;
-    final uid = widget.friendUid;
-    await FirebaseFirestore.instance.collection("users").doc(uid).update(
-      {
-        "calendars": '',
-      },
-    );
-
-    var response = await FirebaseFirestore.instance
-        .collection(collection_url)
-        // .where('data', isEqualTo: '2023-05-17')
-        .get();
-    try {
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      print('print:-------------------------------------------------------');
-      // print('print query: ${await firestore.collection(collection_url).get()}');
-      QuerySnapshot querySnapshot = await firestore
-          .collection(collection_url)
-          // .where('title', isEqualTo: 'Fg')
-          .get();
-      // print("print docs: ${querySnapshot.docs}");
-
-      if (querySnapshot.docs.isNotEmpty) {
-        for (var doc in querySnapshot.docs) {
-          print('print id: ${doc.id}');
-
-          mySelectedEvents.forEach((key, value) {
-            // print("print $key, $value");
-            // print("print: ${value[0]["title"]}");
-            for (var v in value) {
-              // print("print: $key");
-              // print("print v: $v");
-              // print("print v: ${v["title"]}");
-              print("print document: ${v["document"]}");
-              if (doc.id == v["document"]) {
-                print('print: true');
-                FirebaseFirestore.instance
-                    .collection(collection_url)
-                    .doc(v["document"])
-                    .update({
-                  "isChecked": v["isChecked"],
-                });
-                // FirebaseFirestore.instance.collection(collection_url).add({
-                //   "date": key,
-                //   "title": v["title"],
-                //   "desc": v["desc"],
-                //   "isChecked": v["isChecked"],
-                // });
-              }
-            }
-          });
-        }
-        // 검색 결과에서 첫 번째 문서의 ID를 가져옴
-        String documentID = querySnapshot.docs[0].id;
-        print('print 문서 ID: $documentID');
-      } else {
-        print('print 해당하는 문서를 찾을 수 없음');
-      }
     } on FirebaseException catch (e) {
       print(e);
     } catch (error) {
@@ -218,7 +139,7 @@ class _EventCalendarState extends State<EventCalendar> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            child: const Text('Add Event'),
+            child: const Text('Add Event--'),
             onPressed: () {
               if (titleController.text.isEmpty &&
                   descpController.text.isEmpty) {
@@ -240,9 +161,9 @@ class _EventCalendarState extends State<EventCalendar> {
                 //Navigator.pop(context);
                 return;
               } else {
-                DateTime dt = DateTime.now();
-                String timestamp = dt.millisecondsSinceEpoch.toString();
-                print(timestamp);
+                print(titleController.text);
+                print(descpController.text);
+
                 setState(() {
                   if (mySelectedEvents[
                           DateFormat('yyyy-MM-dd').format(_selectedDate!)] !=
@@ -252,8 +173,6 @@ class _EventCalendarState extends State<EventCalendar> {
                         ?.add({
                       "title": titleController.text,
                       "desc": descpController.text,
-                      "isChecked": false,
-                      "document": timestamp,
                     });
                   } else {
                     mySelectedEvents[
@@ -261,21 +180,14 @@ class _EventCalendarState extends State<EventCalendar> {
                       {
                         "title": titleController.text,
                         "desc": descpController.text,
-                        "isChecked": false,
-                        "document": timestamp,
                       }
                     ];
                   }
                 });
-                FirebaseFirestore.instance
-                    .collection(collection_url)
-                    .doc(timestamp)
-                    .set({
+                FirebaseFirestore.instance.collection(collection_url).add({
                   "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
                   "title": titleController.text,
                   "desc": descpController.text,
-                  "isChecked": false,
-                  "document": timestamp,
                 });
                 print(
                     "New Event for backend developer ${json.encode(mySelectedEvents)}");
@@ -291,52 +203,16 @@ class _EventCalendarState extends State<EventCalendar> {
     );
   }
 
-  _deleteEventDialog() {
-    print("print: 삭제버튼 탭");
-    print(
-        'print1: ${mySelectedEvents[DateFormat('yyyy-MM-dd').format(_selectedDate!)]!.where((element) => element["title"] == "asdf")}');
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          '일정 삭제',
-          textAlign: TextAlign.center,
-        ),
-        content: const Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "삭제하시겠습니까?",
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            child: const Text('삭제'),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Every Calendar'),
         foregroundColor: Colors.black,
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        // title: const Text(user_name),
+        //title: const Text(user_name),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -377,23 +253,25 @@ class _EventCalendarState extends State<EventCalendar> {
               ),
               ..._listOfDayEvents(_selectedDate!).map(
                 (myEvents) => ListTile(
-                  leading: Icon(
-                    myEvents['isChecked']
-                        ? Icons.check_box
-                        : Icons.check_box_outline_blank,
-                    color: Colors.teal,
+                  leading: const Icon(
+                    Icons.done,
+                    color: Color.fromRGBO(217, 128, 235, 1),
                   ),
                   title: Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text('Event Title:   ${myEvents['title']}'),
+                    child: Text('to do:   ${myEvents['title']}'),
                   ),
-                  subtitle: Text('Description:   ${myEvents['desc']}'),
+                  subtitle: Text('설명:   ${myEvents['desc']}'),
                 ),
               ),
             ],
           ),
         ),
       ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () => _showAddEventDialog(),
+      //   label: const Text('Add Event'),
+      // ),
     );
   }
 }

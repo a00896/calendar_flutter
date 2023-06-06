@@ -33,18 +33,26 @@ class SettingScreen extends StatelessWidget {
             },
           ),
           actions: [
-            TextButton(
-              child: const Text('취소'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: const Text('확인'),
-              onPressed: () {
-                controller.updateNickname(newNickname);
-                Navigator.pop(context);
-              },
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    child: const Text('취소'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  SizedBox(width: 10), // 버튼 사이의 공간을 추가
+                  TextButton(
+                    child: const Text('확인'),
+                    onPressed: () {
+                      controller.updateNickname(newNickname);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         );
@@ -180,7 +188,7 @@ class SettingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('설정'),
+        title: const Text('Setting'),
       ),
       body: Container(
         child: Stack(

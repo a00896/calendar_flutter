@@ -12,16 +12,19 @@ class FriendScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: const Text('친구 목록'),
+        foregroundColor: Color.fromARGB(255, 159, 190, 248),
+        backgroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: Icon(Icons.notifications),
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return const SimpleDialog(
-                    title: Text('알림'),
+                  return SimpleDialog(
+                    title: const Text('알림'),
                     children: [
                       ListTile(),
                     ],
@@ -68,10 +71,10 @@ class FriendScreen extends StatelessWidget {
                       ),
                       title: Text(
                         friendName,
-                        style: const TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18),
                       ),
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
+                        icon: Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
                           showDialog(
                             context: context,

@@ -2,6 +2,7 @@ import 'package:calendar2/screens/event_calendar_screen.dart';
 // import 'package:calendar2/screens/search_screen.dart';
 import 'package:calendar2/screens/profile_screen.dart';
 import 'package:calendar2/screens/progresspage.dart';
+import 'package:calendar2/screens/search_query.dart';
 import 'package:calendar2/widgets/start.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -26,7 +27,6 @@ class _BottomNavigationBarWidgetsState
     // const SearchScreen(),
     FriendScreen(),
     // const EventCalendar(),
-    // const SearchQuery(),
     ProgressPage(),
     // const achievementScreen(),
     ProfileScreen(),
@@ -64,26 +64,26 @@ class _BottomNavigationBarWidgetsState
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),
                     label: '홈',
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Color.fromARGB(255, 171, 216, 253),
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.search),
                     label: '검색',
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Color.fromARGB(255, 146, 206, 255),
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.bar_chart_rounded),
                     label: '달성도',
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Color.fromARGB(255, 149, 206, 253),
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.person),
                     label: '프로필',
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Color.fromARGB(255, 155, 210, 255),
                   ),
                 ],
                 currentIndex: _selectedIndex,
-                selectedItemColor: Colors.amber,
+                selectedItemColor: Color.fromARGB(255, 61, 88, 241),
                 onTap: _onItemTapped,
               ),
             );

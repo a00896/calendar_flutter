@@ -138,12 +138,15 @@ class SettingButtonSection extends StatelessWidget {
               FirebaseAuth.instance.signOut();
             },
             child: Container(
-              width: 200,
-              height: 100,
+              width: 70,
+              height: 40,
               decoration: const BoxDecoration(
-                color: Colors.amber,
+                color: Color.fromARGB(255, 250, 255, 206),
               ),
-              child: const Text("로그아웃"),
+              child: Align(
+                alignment: Alignment.center,
+                child: const Text("로그아웃"),
+              ),
             ),
           ),
         ],
