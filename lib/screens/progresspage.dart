@@ -109,7 +109,7 @@ class ProgressPageState extends State<ProgressPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Progress:',
+              '달성도',
               style: TextStyle(fontSize: 24),
             ),
             SizedBox(height: 20),
@@ -137,7 +137,7 @@ class ProgressPageState extends State<ProgressPage> {
                           name: 'Progress',
                         ),
                         Text(
-                          'Checked Count: $trueCount',
+                          '완료한 갯수: $trueCount',
                           style: TextStyle(fontSize: 16),
                         ),
                       ],
