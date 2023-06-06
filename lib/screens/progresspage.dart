@@ -10,16 +10,11 @@ class ProgressPage extends StatefulWidget {
 class ProgressPageState extends State<ProgressPage> {
   var collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
   Map<String, List> mySelectedEvents = {};
-  List<ProgressData> progressList = [
-    ProgressData(name: 'Graph 1', progress: 0.1),
-    ProgressData(name: 'Graph 2', progress: 0.3),
-    ProgressData(name: 'Graph 3', progress: 0.5),
-  ];
+  List<ProgressData> progressList = [];
 
   @override
-  void initState() {
-    super.initState();
-
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     loadPreviousEvents();
     getUserData();
     getCalendarData();
@@ -52,25 +47,28 @@ class ProgressPageState extends State<ProgressPage> {
     }
 
     try {
-      var response = await FirebaseFirestore.instance
-          .collection(collection_url)
-          .get();
-      for (var result in response.docs) {
-        if (mySelectedEvents[result['date']] != null) {
-          mySelectedEvents[result['date']]?.add({
-            'title': result['title'],
-            'desc': result['desc'],
-          });
-        } else {
-          mySelectedEvents[result['date']] = [
-            {
+      var response =
+      await FirebaseFirestore.instance.collection(collection_url).get();
+      setState(() {
+        mySelectedEvents = {}; // Reset the map before updating
+        for (var result in response.docs) {
+          if (mySelectedEvents[result['date']] != null) {
+            mySelectedEvents[result['date']]?.add({
               'title': result['title'],
               'desc': result['desc'],
-            }
-          ];
+              'isChecked': result['isChecked'],
+            });
+          } else {
+            mySelectedEvents[result['date']] = [
+              {
+                'title': result['title'],
+                'desc': result['desc'],
+                'isChecked': result['isChecked'],
+              }
+            ];
+          }
         }
-        setState(() {});
-      }
+      });
     } on FirebaseException catch (e) {
       print(e);
     } catch (error) {
@@ -92,6 +90,10 @@ class ProgressPageState extends State<ProgressPage> {
     });
   }
 
+  int countCheckedEvents(List events) {
+    return events.where((event) => event['isChecked'] == true).length;
+  }
+
   @override
   Widget build(BuildContext context) {
     print(mySelectedEvents);
@@ -107,19 +109,31 @@ class ProgressPageState extends State<ProgressPage> {
             SizedBox(height: 20),
             Expanded(
               child: ListView.separated(
-                itemCount: progressList.length,
-                separatorBuilder: (context, index) => SizedBox(height: 10), // 그래프 사이 간격
+                itemCount: mySelectedEvents.length,
+                separatorBuilder: (context, index) => SizedBox(height: 10),
                 itemBuilder: (context, index) {
+                  var date = mySelectedEvents.keys.elementAt(index);
+                  var events = mySelectedEvents[date];
+                  var trueCount = countCheckedEvents(events!);
+                  var progress = trueCount / events.length;
+
                   return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20), // 좌우 여백 설정
+                    padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       children: [
                         Text(
-                          progressList[index].name,
+                          date,
                           style: TextStyle(fontSize: 16),
                         ),
                         SizedBox(height: 5),
-                        ProgressBar(progress: progressList[index].progress),
+                        ProgressBar(
+                          progress: progress,
+                          name: 'Progress',
+                        ),
+                        Text(
+                          'Checked Count: $trueCount',
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ],
                     ),
                   );
@@ -127,25 +141,6 @@ class ProgressPageState extends State<ProgressPage> {
               ),
             ),
             SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    addProgressData(
-                      ProgressData(name: 'New Graph', progress: 0.7),
-                    );
-                  },
-                  child: Text('Add Progress'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    removeProgressData();
-                  },
-                  child: Text('Remove Progress'),
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -153,18 +148,19 @@ class ProgressPageState extends State<ProgressPage> {
   }
 }
 
-  class ProgressBar extends StatelessWidget {
+class ProgressBar extends StatelessWidget {
   final double progress;
+  final String name;
 
-  const ProgressBar({required this.progress});
+  const ProgressBar({required this.progress, required this.name});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
-          width: 1000, // 가로 길이를 최대로 확장
-          height: 20, // 그래프의 높이
+          width: 1000,
+          height: 20,
           child: LinearProgressIndicator(
             value: progress,
             backgroundColor: Colors.grey[200],
