@@ -23,11 +23,47 @@ class FriendScreen extends StatelessWidget {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return SimpleDialog(
-                    title: const Text('알림'),
-                    children: [
-                      ListTile(),
-                    ],
+                  return AlertDialog(
+                    title: const Text('친구 요청'),
+                    content: SizedBox(
+                      height: 250.0,
+                      width: 200.0,
+                      child: Obx(
+                        () {
+                          final List<Map<String, dynamic>> friendRequests =
+                              _profileController.friendRequestsData;
+                          if (friendRequests.isEmpty) {
+                            return const Center(
+                              child: Text('친구 요청이 없습니다.'),
+                            );
+                          } else {
+                            return ListView.builder(
+                              itemCount: friendRequests.length,
+                              itemBuilder: (context, index) {
+                                String requesterId =
+                                    friendRequests[index]['uid'] ?? '';
+                                String requesterName =
+                                    friendRequests[index]['name'] ?? '';
+                                String requesterImageUrl =
+                                    friendRequests[index]['imageUrl'] ?? '';
+
+                                return FriendRequestCard(
+                                  requesterId: requesterId,
+                                  requesterName: requesterName,
+                                  requesterImageUrl: requesterImageUrl,
+                                  acceptCallback: () {
+                                    _profileController.acceptFriendRequest(requesterId);
+                                  },
+                                  rejectCallback: () {
+                                    _profileController.rejectFriendRequest(requesterId);
+                                  },
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ),
                   );
                 },
               );
@@ -44,124 +80,102 @@ class FriendScreen extends StatelessWidget {
               child: Text('친구가 없습니다.'),
             );
           } else {
-            return Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: ListView.builder(
-                itemCount: friends.length,
-                itemBuilder: (context, index) {
-                  String friendName = friends[index]['name'] ?? '';
-                  String friendImageUrl = friends[index]['imageUrl'] ?? '';
+            return ListView.builder(
+              itemCount: friends.length,
+              itemBuilder: (context, index) {
+                String friendName = friends[index]['name'] ?? '';
+                String friendImageUrl = friends[index]['imageUrl'] ?? '';
 
-                  return Container(
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 12.0), // Add vertical margin
-                    child: ListTile(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: ((context) => EventCalendar(
-                                friendUid: friends[index]['uid'])),
-                          ),
-                        );
-                      },
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(friendImageUrl),
-                        radius: 30,
-                      ),
-                      title: Text(
-                        friendName,
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('친구 삭제'),
-                                content: const Text('정말로 삭제하시겠습니까?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () async {
-                                      await _profileController
-                                          .deleteFriend(index);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('예'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('취소'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: ((context) => EventCalendar(
+                            friendUid: friends[index]['uid'],
+                          )),
+                        ),
+                      );
+                    },
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(friendImageUrl),
+                      radius: 30,
+                    ),
+                    title: Text(
+                      friendName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  );
-                },
-              ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        _profileController.deleteFriend(index);
+                      },
+                    ),
+                  ),
+                );
+              },
             );
           }
         },
       ),
       floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
         onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('친구 추가'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: _profileController.emailController,
-                      decoration: const InputDecoration(
-                        labelText: '이메일',
-                      ),
-                    ),
-                    Obx(() {
-                      final errorMessage =
-                          _profileController.errorMessage.value;
-                      if (errorMessage.isNotEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            errorMessage,
-                            style: const TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
-                        );
-                      } else {
-                        return const SizedBox.shrink();
-                      }
-                    }),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () async {
-                      await _profileController.addFriend();
-                      if (_profileController.errorMessage.value.isEmpty) {
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    child: const Text('추가'),
-                  ),
-                ],
-              );
-            },
-          );
+          // Add friend functionality
         },
-        child: const Icon(Icons.person_add),
+      ),
+    );
+  }
+}
+
+class FriendRequestCard extends StatelessWidget {
+  final String requesterId;
+  final String requesterName;
+  final String requesterImageUrl;
+  final VoidCallback acceptCallback;
+  final VoidCallback rejectCallback;
+
+  const FriendRequestCard({
+    required this.requesterId,
+    required this.requesterName,
+    required this.requesterImageUrl,
+    required this.acceptCallback,
+    required this.rejectCallback,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundImage: NetworkImage(requesterImageUrl),
+          radius: 30,
+        ),
+        title: Text(
+          requesterName,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text('친구 요청이 도착했습니다.'),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: acceptCallback,
+            ),
+            IconButton(
+              icon: Icon(Icons.close),
+              onPressed: rejectCallback,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -14,6 +14,7 @@ class ProfileController extends GetxController {
   var imageUrl = ''.obs;
   var friendData = <Map<String, dynamic>>[].obs;
   final emailController = TextEditingController();
+  var friendRequestsData = <Map<String, dynamic>>[].obs;
   final RxString errorMessage = ''.obs;
 
   @override
@@ -64,34 +65,10 @@ class ProfileController extends GetxController {
       this.userName.value = newNickname;
     }
   }
-
-  Future<void> addFriend() async {
-  String email = emailController.text.trim();
-
-  if (email.isEmpty) {
-    errorMessage.value = '이메일을 입력해주세요.';
-    return;
-  }
-
-  QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
-      .collection('users')
-      .where('email', isEqualTo: email)
-      .get();
-
-  if (snapshot.docs.isEmpty) {
-    errorMessage.value = '해당 이메일이 존재하지 않습니다.';
-    return;
-  }
-
+Future<void> acceptFriendRequest(String friendId) async {
   User? user = FirebaseAuth.instance.currentUser;
   if (user != null) {
     String userId = user.uid;
-    String friendId = snapshot.docs.first.id;
-
-    if (isFriend(userId, friendId)) {
-      errorMessage.value = '이미 친구입니다.';
-      return;
-    }
 
     CollectionReference<Map<String, dynamic>> usersCollection =
         FirebaseFirestore.instance.collection('users');
@@ -106,14 +83,101 @@ class ProfileController extends GetxController {
       'friends': FieldValue.arrayUnion([userId])
     });
 
+    // Delete friend request from the user's document
+    await usersCollection
+        .doc(userId)
+        .collection('friend_requests')
+        .doc(friendId)
+        .delete();
+
     getProfileData();
   }
+}
+Future<void> rejectFriendRequest(String friendId) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    String userId = user.uid;
 
-  emailController.clear();
+    CollectionReference<Map<String, dynamic>> usersCollection =
+        FirebaseFirestore.instance.collection('users');
+
+    // Delete friend request from the user's document
+    await usersCollection
+        .doc(userId)
+        .collection('friend_requests')
+        .doc(friendId)
+        .delete();
+
+    getProfileData();
+  }
+}
+Future<void> addFriendByEmail(String friendEmail) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    String userId = user.uid;
+
+    if (isFriendByEmail(friendEmail)) {
+      errorMessage.value = '이미 친구입니다.';
+      return;
+    }
+
+    CollectionReference<Map<String, dynamic>> usersCollection =
+        FirebaseFirestore.instance.collection('users');
+
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await usersCollection.where('email', isEqualTo: friendEmail).get();
+    if (querySnapshot.docs.isNotEmpty) {
+      DocumentSnapshot<Map<String, dynamic>> friendSnapshot = querySnapshot.docs.first;
+      String friendId = friendSnapshot.id;
+
+      // Create friend request in the friend's document
+      await usersCollection.doc(friendId).collection('friend_requests').doc(userId).set({
+        'uid': userId,
+        'name': userName.value,
+        'imageUrl': imageUrl.value,
+      });
+    } else {
+      errorMessage.value = '존재하지 않는 사용자입니다.';
+    }
+  }
+}
+bool isFriendByEmail(String friendEmail) {
+  for (Map<String, dynamic> friend in friendData) {
+    if (friend['email'] == friendEmail) {
+      return true;
+    }
+  }
+  return false;
+}
+  Future<void> addFriend(String friendId) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    String userId = user.uid;
+
+    if (isFriend(userId, friendId)) {
+      errorMessage.value = '이미 친구입니다.';
+      return;
+    }
+
+    CollectionReference<Map<String, dynamic>> usersCollection =
+        FirebaseFirestore.instance.collection('users');
+
+    // Create friend request in the friend's document
+    await usersCollection
+        .doc(friendId)
+        .collection('friend_requests')
+        .doc(userId)
+        .set({
+      'uid': userId,
+      'name': userName.value,
+      'imageUrl': imageUrl.value,
+    });
+
+    getProfileData();
+  }
 }
 
 
-  Future<void> deleteFriend(int index) async {
+Future<void> deleteFriend(int index) async {
   User? user = FirebaseAuth.instance.currentUser;
   if (user != null) {
     String userId = user.uid;
@@ -136,7 +200,23 @@ class ProfileController extends GetxController {
   }
 }
 
+Future<void> sendFriendRequest(String friendId) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
 
+      CollectionReference<Map<String, dynamic>> usersCollection =
+          FirebaseFirestore.instance.collection('users');
+
+      // Create friend request in the friend's document
+      await usersCollection.doc(friendId).collection('friend_requests').doc(userId).set({
+        'uid': userId,
+        'name': userName.value,
+        'imageUrl': imageUrl.value,
+      });
+    }
+  }
+  
   void getProfileData() async {
   User? user = FirebaseAuth.instance.currentUser;
   if (user != null) {
@@ -171,6 +251,14 @@ class ProfileController extends GetxController {
 
       userName.value = userData?['name'] ?? '';
       imageUrl.value = userData?['imageUrl'] ?? '';
+
+      // Get friend requests data
+      QuerySnapshot<Map<String, dynamic>> friendRequestsSnapshot =
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).collection('friend_requests').get();
+      
+      // Clear friendRequestsData and populate it with the retrieved data
+      friendRequestsData.clear();
+      friendRequestsData.addAll(friendRequestsSnapshot.docs.map((doc) => doc.data()));
     }
   }
 }
@@ -183,7 +271,7 @@ class ProfileController extends GetxController {
     }
     return false;
   }
-
+  
   @override
   void onClose() {
     emailController.dispose();
