@@ -47,27 +47,32 @@ class ProgressPageState extends State<ProgressPage> {
     }
 
     try {
-      var response =
-      await FirebaseFirestore.instance.collection(collection_url).get();
-      setState(() {
-        mySelectedEvents = {}; // Reset the map before updating
-        for (var result in response.docs) {
-          if (mySelectedEvents[result['date']] != null) {
-            mySelectedEvents[result['date']]?.add({
-              'title': result['title'],
-              'desc': result['desc'],
-              'isChecked': result['isChecked'],
-            });
-          } else {
-            mySelectedEvents[result['date']] = [
-              {
+      var collectionReference =
+      FirebaseFirestore.instance.collection(collection_url);
+      var snapshot = await collectionReference.get();
+
+      // Listen for realtime changes
+      collectionReference.snapshots().listen((snapshot) {
+        setState(() {
+          mySelectedEvents = {}; // Reset the map before updating
+          for (var result in snapshot.docs) {
+            if (mySelectedEvents[result['date']] != null) {
+              mySelectedEvents[result['date']]?.add({
                 'title': result['title'],
                 'desc': result['desc'],
                 'isChecked': result['isChecked'],
-              }
-            ];
+              });
+            } else {
+              mySelectedEvents[result['date']] = [
+                {
+                  'title': result['title'],
+                  'desc': result['desc'],
+                  'isChecked': result['isChecked'],
+                }
+              ];
+            }
           }
-        }
+        });
       });
     } on FirebaseException catch (e) {
       print(e);
@@ -75,6 +80,7 @@ class ProgressPageState extends State<ProgressPage> {
       print(error);
     }
   }
+
 
   void addProgressData(ProgressData progressData) {
     setState(() {
