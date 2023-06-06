@@ -144,6 +144,7 @@ class ProfileController extends GetxController {
         await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     if (snapshot.exists) {
       var userData = snapshot.data();
+      userEmail.value = userData?['email'] ?? '';
       List<dynamic> friendIds = userData?['friends'] ?? [];
       
       // Create a temporary map to store friend data
