@@ -10,7 +10,11 @@ class ProgressPage extends StatefulWidget {
 class ProgressPageState extends State<ProgressPage> {
   var collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
   Map<String, List> mySelectedEvents = {};
-  List<ProgressData> progressList = [ ];
+  List<ProgressData> progressList = [
+    ProgressData(name: 'Graph 1', progress: 0.1),
+    ProgressData(name: 'Graph 2', progress: 0.3),
+    ProgressData(name: 'Graph 3', progress: 0.5),
+  ];
 
   @override
   void initState() {
@@ -103,23 +107,19 @@ class ProgressPageState extends State<ProgressPage> {
             SizedBox(height: 20),
             Expanded(
               child: ListView.separated(
-                itemCount: mySelectedEvents.length,
-                separatorBuilder: (context, index) => SizedBox(height: 10),
+                itemCount: progressList.length,
+                separatorBuilder: (context, index) => SizedBox(height: 10), // 그래프 사이 간격
                 itemBuilder: (context, index) {
-                  var date = mySelectedEvents.keys.elementAt(index);
-                  var events = mySelectedEvents[date];
-                  var eventName = events?.first['title'] ?? '';
-
                   return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20), // 좌우 여백 설정
                     child: Column(
                       children: [
                         Text(
-                          date,
+                          progressList[index].name,
                           style: TextStyle(fontSize: 16),
                         ),
                         SizedBox(height: 5),
-                        ProgressBar(progress: 0.0, name: eventName),
+                        ProgressBar(progress: progressList[index].progress),
                       ],
                     ),
                   );
@@ -127,6 +127,25 @@ class ProgressPageState extends State<ProgressPage> {
               ),
             ),
             SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    addProgressData(
+                      ProgressData(name: 'New Graph', progress: 0.7),
+                    );
+                  },
+                  child: Text('Add Progress'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    removeProgressData();
+                  },
+                  child: Text('Remove Progress'),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -134,19 +153,18 @@ class ProgressPageState extends State<ProgressPage> {
   }
 }
 
-class ProgressBar extends StatelessWidget {
+  class ProgressBar extends StatelessWidget {
   final double progress;
-  final String name;
 
-  const ProgressBar({required this.progress, required this.name});
+  const ProgressBar({required this.progress});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
-          width: 1000,
-          height: 20,
+          width: 1000, // 가로 길이를 최대로 확장
+          height: 20, // 그래프의 높이
           child: LinearProgressIndicator(
             value: progress,
             backgroundColor: Colors.grey[200],

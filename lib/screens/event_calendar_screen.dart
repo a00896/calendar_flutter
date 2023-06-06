@@ -16,7 +16,7 @@ class EventCalendarScreen extends StatefulWidget {
 }
 
 class _EventCalendarScreenState extends State<EventCalendarScreen> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDate;
 
@@ -329,15 +329,16 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Colors.black,
-        backgroundColor: Colors.white,
+        title: Text('every calendar'),
+        foregroundColor: Color.fromARGB(255, 154, 173, 255),
+        backgroundColor: const Color.fromARGB(255, 247, 247, 247),
         elevation: 0,
         centerTitle: true,
         // title: const Text(user_name),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           child: Column(
             children: [
               TableCalendar(
@@ -371,6 +372,12 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                   _focusedDay = focusedDay;
                 },
                 eventLoader: _listOfDayEvents,
+              ),
+              Container(
+                height: 1,
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 192, 192, 192),
+                ),
               ),
               ..._listOfDayEvents(_selectedDate!).map(
                 (myEvents) => ListTile(
