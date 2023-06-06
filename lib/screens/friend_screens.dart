@@ -15,13 +15,13 @@ class FriendScreen extends StatelessWidget {
         title: const Text('친구 목록'),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications),
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return SimpleDialog(
-                    title: const Text('알림'),
+                  return const SimpleDialog(
+                    title: Text('알림'),
                     children: [
                       ListTile(),
                     ],
@@ -34,7 +34,8 @@ class FriendScreen extends StatelessWidget {
       ),
       body: Obx(
         () {
-          final List<Map<String, dynamic>> friends = _profileController.friendData;
+          final List<Map<String, dynamic>> friends =
+              _profileController.friendData;
           if (friends.isEmpty) {
             return const Center(
               child: Text('친구가 없습니다.'),
@@ -49,14 +50,15 @@ class FriendScreen extends StatelessWidget {
                   String friendImageUrl = friends[index]['imageUrl'] ?? '';
 
                   return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 12.0), // Add vertical margin
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 12.0), // Add vertical margin
                     child: ListTile(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: ((context) =>
-                                EventCalendar(friendUid: friends[index]['uid'])),
+                            builder: ((context) => EventCalendar(
+                                friendUid: friends[index]['uid'])),
                           ),
                         );
                       },
@@ -66,10 +68,10 @@ class FriendScreen extends StatelessWidget {
                       ),
                       title: Text(
                         friendName,
-                        style: TextStyle(fontSize: 18),
+                        style: const TextStyle(fontSize: 18),
                       ),
                       trailing: IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
+                        icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
                           showDialog(
                             context: context,
@@ -80,7 +82,8 @@ class FriendScreen extends StatelessWidget {
                                 actions: [
                                   TextButton(
                                     onPressed: () async {
-                                      await _profileController.deleteFriend(index);
+                                      await _profileController
+                                          .deleteFriend(index);
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text('예'),
@@ -122,7 +125,8 @@ class FriendScreen extends StatelessWidget {
                       ),
                     ),
                     Obx(() {
-                      final errorMessage = _profileController.errorMessage.value;
+                      final errorMessage =
+                          _profileController.errorMessage.value;
                       if (errorMessage.isNotEmpty) {
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),

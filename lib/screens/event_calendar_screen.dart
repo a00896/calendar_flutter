@@ -131,29 +131,51 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
         // .where('data', isEqualTo: '2023-05-17')
         .get();
     try {
-      mySelectedEvents.forEach((key, value) {
-        // print("print $key, $value");
-        // print("print: ${value[0]["title"]}");
-        for (var v in value) {
-          // print("print: $key");
-          print("print v: $v");
-          // print("print v: ${v["title"]}");
-          var document = v["document"];
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      print('print:-------------------------------------------------------');
+      // print('print query: ${await firestore.collection(collection_url).get()}');
+      QuerySnapshot querySnapshot = await firestore
+          .collection(collection_url)
+          // .where('title', isEqualTo: 'Fg')
+          .get();
+      // print("print docs: ${querySnapshot.docs}");
 
-          // FirebaseFirestore.instance
-          //     .collection(collection_url)
-          //     .doc(document)
-          //     .update({
-          //   "isChecked": v["isChecked"],
-          // });
-          // FirebaseFirestore.instance.collection(collection_url).add({
-          //   "date": key,
-          //   "title": v["title"],
-          //   "desc": v["desc"],
-          //   "isChecked": v["isChecked"],
-          // });
+      if (querySnapshot.docs.isNotEmpty) {
+        for (var doc in querySnapshot.docs) {
+          print('print id: ${doc.id}');
+
+          mySelectedEvents.forEach((key, value) {
+            // print("print $key, $value");
+            // print("print: ${value[0]["title"]}");
+            for (var v in value) {
+              // print("print: $key");
+              // print("print v: $v");
+              // print("print v: ${v["title"]}");
+              print("print document: ${v["document"]}");
+              if (doc.id == v["document"]) {
+                print('print: true');
+                FirebaseFirestore.instance
+                    .collection(collection_url)
+                    .doc(v["document"])
+                    .update({
+                  "isChecked": v["isChecked"],
+                });
+                // FirebaseFirestore.instance.collection(collection_url).add({
+                //   "date": key,
+                //   "title": v["title"],
+                //   "desc": v["desc"],
+                //   "isChecked": v["isChecked"],
+                // });
+              }
+            }
+          });
         }
-      });
+        // 검색 결과에서 첫 번째 문서의 ID를 가져옴
+        String documentID = querySnapshot.docs[0].id;
+        print('print 문서 ID: $documentID');
+      } else {
+        print('print 해당하는 문서를 찾을 수 없음');
+      }
     } on FirebaseException catch (e) {
       print(e);
     } catch (error) {
@@ -215,6 +237,9 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                 //Navigator.pop(context);
                 return;
               } else {
+                DateTime dt = DateTime.now();
+                String timestamp = dt.millisecondsSinceEpoch.toString();
+                print(timestamp);
                 setState(() {
                   if (mySelectedEvents[
                           DateFormat('yyyy-MM-dd').format(_selectedDate!)] !=
@@ -225,6 +250,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                       "title": titleController.text,
                       "desc": descpController.text,
                       "isChecked": false,
+                      "document": timestamp,
                     });
                   } else {
                     mySelectedEvents[
@@ -233,15 +259,20 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                         "title": titleController.text,
                         "desc": descpController.text,
                         "isChecked": false,
+                        "document": timestamp,
                       }
                     ];
                   }
                 });
-                FirebaseFirestore.instance.collection(collection_url).add({
+                FirebaseFirestore.instance
+                    .collection(collection_url)
+                    .doc(timestamp)
+                    .set({
                   "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
                   "title": titleController.text,
                   "desc": descpController.text,
                   "isChecked": false,
+                  "document": timestamp,
                 });
                 print(
                     "New Event for backend developer ${json.encode(mySelectedEvents)}");
@@ -361,7 +392,27 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                   ),
                   subtitle: Text('Description:   ${myEvents['desc']}'),
                   trailing: IconButton(
-                    onPressed: _deleteEventDialog,
+                    // onPressed: _deleteEventDialog,
+                    onPressed: () {
+                      print("print: 삭제버튼클릭");
+                      print('print: $myEvents');
+                      FirebaseFirestore.instance
+                          .collection(collection_url)
+                          .doc(myEvents['document'])
+                          .delete()
+                          .then(
+                            (doc) => print("Document deleted"),
+                            onError: (e) => print("Error updating document $e"),
+                          );
+                      setState(() {
+                        mySelectedEvents.forEach((key, values) {
+                          print("print remove1: $mySelectedEvents");
+                          values.removeWhere((value) => value == myEvents);
+
+                          print("print remove2: $mySelectedEvents");
+                        });
+                      });
+                    },
                     icon: const Icon(
                       Icons.delete,
                       color: Colors.red,
