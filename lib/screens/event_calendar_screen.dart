@@ -8,6 +8,41 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 
+const List<String> list = <String>[
+  '일어나기',
+  '밥 먹기',
+  '과제 하기',
+  '과제 제출 하기',
+  '런닝하기',
+  '산책하기',
+  '회의',
+  '직접입력'
+];
+
+const List<String> timeList = <String>[
+  '',
+  '00시',
+  '01시',
+  '02시',
+  '03시',
+  '09시',
+  '10시',
+  '11시',
+  '12시',
+  '13시',
+  '14시',
+  '15시',
+  '16시',
+  '17시',
+  '18시',
+  '19시',
+  '20시',
+  '21시',
+  '22시',
+  '23시',
+  '24시',
+];
+
 class EventCalendarScreen extends StatefulWidget {
   const EventCalendarScreen({Key? key}) : super(key: key);
 
@@ -27,6 +62,8 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   var collection_url = 'users/yWzLtNsNz2UrJjvGGq1lmR4aOVv2/calendars';
   var calendar_url;
   var user_name = 'Every Calendar';
+  String dropdownValue = list.first;
+  String dropdownTimeValue = timeList.first;
 
   @override
   void initState() {
@@ -188,104 +225,202 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   _showAddEventDialog() async {
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          'Add New Event',
-          textAlign: TextAlign.center,
-        ),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Title',
+      builder: (context) => StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: const Text(
+              '새로운 일정 추가',
+              textAlign: TextAlign.center,
+            ),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: '제목',
+                  ),
+                ),
+                DropdownButton<String>(
+                  value: dropdownTimeValue,
+                  icon: const Icon(Icons.arrow_downward),
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.deepPurple),
+                  underline: Container(
+                    height: 2,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      dropdownTimeValue = value!;
+                    });
+                  },
+                  items: timeList.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                DropdownButton<String>(
+                  value: dropdownValue,
+                  icon: const Icon(Icons.arrow_downward),
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.deepPurple),
+                  underline: Container(
+                    height: 2,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      dropdownValue = value!;
+                    });
+                  },
+                  items: list.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                TextField(
+                  enabled: (dropdownValue == '직접입력') ? true : false,
+                  controller: descpController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(labelText: '내용'),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('취소'),
               ),
-            ),
-            TextField(
-              controller: descpController,
-              textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Description'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            child: const Text('Add Event'),
-            onPressed: () {
-              if (titleController.text.isEmpty &&
-                  descpController.text.isEmpty) {
-                // const SnackBar(
-                //   content: Text('Required title and description'),
-                //   duration: Duration(seconds: 2),
-                // );
+              TextButton(
+                child: const Text('추가'),
+                onPressed: () {
+                  // if (titleController.text.isEmpty &&
+                  // descpController.text.isEmpty) {
+                  if (titleController.text.isEmpty) {
+                    // const SnackBar(
+                    //   content: Text('Required title and description'),
+                    //   duration: Duration(seconds: 2),
+                    // );
 
-                // SnackBar가 안되서 일단 toast msg로 대체
-                Fluttertoast.showToast(
-                    msg: "Required title and description",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.grey,
-                    textColor: Colors.white,
-                    fontSize: 16.0);
+                    // SnackBar가 안되서 일단 toast msg로 대체
+                    Fluttertoast.showToast(
+                        msg: "제목을 입력해주세요",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.grey,
+                        textColor: Colors.white,
+                        fontSize: 16.0);
 
-                //Navigator.pop(context);
-                return;
-              } else {
-                DateTime dt = DateTime.now();
-                String timestamp = dt.millisecondsSinceEpoch.toString();
-                print(timestamp);
-                setState(() {
-                  if (mySelectedEvents[
-                          DateFormat('yyyy-MM-dd').format(_selectedDate!)] !=
-                      null) {
-                    mySelectedEvents[
-                            DateFormat('yyyy-MM-dd').format(_selectedDate!)]
-                        ?.add({
+                    //Navigator.pop(context);
+                    return;
+                  } else if (dropdownValue == "직접입력") {
+                    DateTime dt = DateTime.now();
+                    String timestamp = dt.millisecondsSinceEpoch.toString();
+                    print(timestamp);
+                    setState(() {
+                      if (mySelectedEvents[DateFormat('yyyy-MM-dd')
+                              .format(_selectedDate!)] !=
+                          null) {
+                        mySelectedEvents[
+                                DateFormat('yyyy-MM-dd').format(_selectedDate!)]
+                            ?.add({
+                          "title": titleController.text,
+                          "desc": descpController.text,
+                          "isChecked": false,
+                          "document": timestamp,
+                        });
+                      } else {
+                        mySelectedEvents[
+                            DateFormat('yyyy-MM-dd').format(_selectedDate!)] = [
+                          {
+                            "title": titleController.text,
+                            "desc": descpController.text,
+                            "isChecked": false,
+                            "document": timestamp,
+                          }
+                        ];
+                      }
+                    });
+                    FirebaseFirestore.instance
+                        .collection(collection_url)
+                        .doc(timestamp)
+                        .set({
+                      "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
                       "title": titleController.text,
                       "desc": descpController.text,
                       "isChecked": false,
                       "document": timestamp,
                     });
-                  } else {
-                    mySelectedEvents[
-                        DateFormat('yyyy-MM-dd').format(_selectedDate!)] = [
-                      {
-                        "title": titleController.text,
-                        "desc": descpController.text,
-                        "isChecked": false,
-                        "document": timestamp,
+                    print(
+                        "New Event for backend developer ${json.encode(mySelectedEvents)}");
+                    titleController.clear();
+                    descpController.clear();
+                    Navigator.pop(context);
+                    return;
+                  } else if (dropdownValue != "직접입력") {
+                    DateTime dt = DateTime.now();
+                    String timestamp = dt.millisecondsSinceEpoch.toString();
+                    print(timestamp);
+                    setState(() {
+                      if (mySelectedEvents[DateFormat('yyyy-MM-dd')
+                              .format(_selectedDate!)] !=
+                          null) {
+                        mySelectedEvents[
+                                DateFormat('yyyy-MM-dd').format(_selectedDate!)]
+                            ?.add({
+                          "title": titleController.text,
+                          "desc": '$dropdownTimeValue $dropdownValue',
+                          "isChecked": false,
+                          "document": timestamp,
+                        });
+                      } else {
+                        mySelectedEvents[
+                            DateFormat('yyyy-MM-dd').format(_selectedDate!)] = [
+                          {
+                            "title": titleController.text,
+                            "desc": '$dropdownTimeValue $dropdownValue',
+                            "isChecked": false,
+                            "document": timestamp,
+                          }
+                        ];
                       }
-                    ];
+                    });
+                    FirebaseFirestore.instance
+                        .collection(collection_url)
+                        .doc(timestamp)
+                        .set({
+                      "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
+                      "title": titleController.text,
+                      "desc": '$dropdownTimeValue $dropdownValue',
+                      "isChecked": false,
+                      "document": timestamp,
+                    });
+                    print(
+                        "New Event for backend developer ${json.encode(mySelectedEvents)}");
+                    titleController.clear();
+                    descpController.clear();
+                    Navigator.pop(context);
+                    return;
                   }
-                });
-                FirebaseFirestore.instance
-                    .collection(collection_url)
-                    .doc(timestamp)
-                    .set({
-                  "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
-                  "title": titleController.text,
-                  "desc": descpController.text,
-                  "isChecked": false,
-                  "document": timestamp,
-                });
-                print(
-                    "New Event for backend developer ${json.encode(mySelectedEvents)}");
-                titleController.clear();
-                descpController.clear();
-                Navigator.pop(context);
-                return;
-              }
-            },
-          )
-        ],
+                },
+              )
+            ],
+          );
+        },
       ),
     );
   }
@@ -399,7 +534,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                   title: Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
-                      'Event Title:   ${myEvents['title']}',
+                      '제목:   ${myEvents['title']}',
                       style: TextStyle(
                         decoration: myEvents['isChecked']
                             ? TextDecoration.lineThrough
@@ -408,7 +543,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                     ),
                   ),
                   subtitle: Text(
-                    'Description:   ${myEvents['desc']}',
+                    '내용:   ${myEvents['desc']}',
                     style: TextStyle(
                       decoration: myEvents['isChecked']
                           ? TextDecoration.lineThrough
@@ -450,7 +585,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEventDialog(),
-        label: const Text('Add Event'),
+        label: const Text('일정 추가'),
       ),
     );
   }

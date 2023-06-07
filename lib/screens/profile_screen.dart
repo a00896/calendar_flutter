@@ -1,6 +1,6 @@
 import 'package:calendar2/controller/ProfileController.dart';
 import 'package:calendar2/screens/setting_screen.dart';
-import 'package:calendar2/widgets/start.dart';
+import 'package:calendar2/screens/start_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -135,12 +135,16 @@ class SettingButtonSection extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              FirebaseAuth.instance.signOut();
-              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const Start()),
-                (Route<dynamic> route) => false,
-              );
+            onTap: () async {
+              try {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const StartScreen()),
+                  (Route<dynamic> route) => false,
+                );
+              } catch (e) {
+                print(e.toString());
+              }
             },
             child: Container(
               width: 70,
