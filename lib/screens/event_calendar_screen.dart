@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 const List<String> list = <String>[
   '일어나기',
@@ -243,53 +245,44 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                     labelText: '제목',
                   ),
                 ),
-                DropdownButton<String>(
-                  value: dropdownTimeValue,
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.deepPurpleAccent,
+                SizedBox(
+                  height: 60.0,
+                  child: CupertinoPicker(
+                    scrollController:
+                        FixedExtentScrollController(initialItem: 0),
+                    itemExtent: 32.0,
+                    useMagnifier: true,
+                    onSelectedItemChanged: (int index) {
+                      dropdownTimeValue = timeList[index];
+                    },
+                    backgroundColor: CupertinoColors.white,
+                    children:
+                        List<Widget>.generate(timeList.length, (int index) {
+                      return Center(child: Text(timeList[index]));
+                    }),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      dropdownTimeValue = value!;
-                    });
-                  },
-                  items: timeList.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
                 ),
                 const SizedBox(
-                  width: 20,
+                  width: 10,
                 ),
-                DropdownButton<String>(
-                  value: dropdownValue,
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.deepPurpleAccent,
+                SizedBox(
+                  height: 60.0,
+                  child: CupertinoPicker(
+                    scrollController:
+                        FixedExtentScrollController(initialItem: 0),
+                    itemExtent: 32.0,
+                    useMagnifier: true,
+                    onSelectedItemChanged: (int index) {
+                      dropdownValue = list[index];
+                    },
+                    backgroundColor: CupertinoColors.white,
+                    children: List<Widget>.generate(list.length, (int index) {
+                      return Center(child: Text(list[index]));
+                    }),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      dropdownValue = value!;
-                    });
-                  },
-                  items: list.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
                 ),
                 const SizedBox(
-                  width: 20,
+                  width: 10,
                 ),
                 TextField(
                   enabled: (dropdownValue == '직접입력') ? true : false,
@@ -588,7 +581,8 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEventDialog(),
-        label: const Text('일정 추가 \u{2728}'),
+        backgroundColor: Color.fromARGB(255, 181, 226, 255),
+        label: const Text('일정 추가 \u{1F4AC}'),
       ),
     );
   }

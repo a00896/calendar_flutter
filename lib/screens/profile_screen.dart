@@ -57,7 +57,7 @@ class ProfileInfoSection extends GetWidget<ProfileController> {
                   controller.userName.value,
                   style: const TextStyle(
                     fontSize: 18,
-                    color: Colors.black,
+                    color: Color.fromARGB(255, 75, 75, 75),
                   ),
                 )),
           ],
@@ -98,7 +98,11 @@ class ProfileImage extends GetWidget<ProfileController> {
       width: 130,
       height: 130,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(80),
+        border: Border.all(
+          color: Colors.grey,
+          width: 1,
+        ),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(40),
@@ -136,7 +140,7 @@ class SettingButtonSection extends StatelessWidget {
                       Icon(
                         Icons.settings,
                         color: Colors.grey,
-                        size: 35,
+                        size: 28,
                       ),
                       SizedBox(height: 10),
                     ],
