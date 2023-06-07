@@ -48,7 +48,7 @@ class ProgressPageState extends State<ProgressPage> {
 
     try {
       var collectionReference =
-      FirebaseFirestore.instance.collection(collection_url);
+          FirebaseFirestore.instance.collection(collection_url);
       var snapshot = await collectionReference.get();
 
       // Listen for realtime changes
@@ -81,7 +81,6 @@ class ProgressPageState extends State<ProgressPage> {
     }
   }
 
-
   void addProgressData(ProgressData progressData) {
     setState(() {
       progressList.add(progressData);
@@ -104,13 +103,25 @@ class ProgressPageState extends State<ProgressPage> {
   Widget build(BuildContext context) {
     print(mySelectedEvents);
     return Scaffold(
+      appBar: AppBar(
+        // AppBar 위젯 추가
+        title: const Text(
+          'progress',
+          style: TextStyle(fontSize: 26), // 원하는 텍스트 크기로 설정
+        ),
+        foregroundColor: Color.fromARGB(255, 154, 198, 255),
+        backgroundColor: const Color.fromARGB(255, 247, 247, 247),
+        elevation: 0, // 페이지 이름 'Progress'
+        centerTitle: true, // 제목을 가운데 정렬(선택 사항)
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(height: 10),
             Text(
-              '달성도',
-              style: TextStyle(fontSize: 24),
+              '일별 달성도\u{1F4AA}',
+              style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 20),
             Expanded(
@@ -123,24 +134,30 @@ class ProgressPageState extends State<ProgressPage> {
                   var trueCount = countCheckedEvents(events!);
                   var progress = trueCount / events.length;
 
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      children: [
-                        Text(
-                          date,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(height: 5),
-                        ProgressBar(
-                          progress: progress,
-                          name: 'Progress',
-                        ),
-                        Text(
-                          '완료한 갯수: $trueCount',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          Text(
+                            date,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          SizedBox(height: 5),
+                          ProgressBar(
+                            progress: progress,
+                            name: 'Progress',
+                          ),
+                          Text(
+                            '완료한 갯수: $trueCount',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -170,7 +187,8 @@ class ProgressBar extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress,
             backgroundColor: Colors.grey[200],
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+            valueColor: AlwaysStoppedAnimation<Color>(
+                Color.fromARGB(255, 224, 232, 253)),
           ),
         ),
         Text(

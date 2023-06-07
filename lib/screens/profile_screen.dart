@@ -1,6 +1,6 @@
 import 'package:calendar2/controller/ProfileController.dart';
 import 'package:calendar2/screens/setting_screen.dart';
-import 'package:calendar2/screens/start_screen.dart';
+import 'package:calendar2/widgets/start.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,6 +16,17 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'my page',
+          style: TextStyle(fontSize: 26), // 원하는 텍스트 크기로 설정
+        ),
+        foregroundColor: Color.fromARGB(255, 173, 218, 255),
+        backgroundColor: const Color.fromARGB(255, 247, 247, 247),
+        elevation: 0,
+        centerTitle: true,
+        // title: const Text(user_name),
+      ),
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
@@ -135,16 +146,12 @@ class SettingButtonSection extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () async {
-              try {
-                await FirebaseAuth.instance.signOut();
-                Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const StartScreen()),
-                  (Route<dynamic> route) => false,
-                );
-              } catch (e) {
-                print(e.toString());
-              }
+            onTap: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const Start()),
+                (Route<dynamic> route) => false,
+              );
             },
             child: Container(
               width: 70,
