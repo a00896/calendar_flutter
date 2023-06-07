@@ -123,11 +123,40 @@ class FriendScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          // Add friend functionality
-        },
-      ),
+  child: Icon(Icons.add),
+  onPressed: () {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('친구 추가'),
+          content: TextField(
+            controller: _profileController.emailController,
+            decoration: InputDecoration(
+              labelText: '친구 이메일',
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('추가'),
+              onPressed: () {
+                String friendEmail = _profileController.emailController.text;
+                _profileController.addFriendByEmail(friendEmail);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  },
+),
     );
   }
 }
@@ -162,7 +191,6 @@ class FriendRequestCard extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        subtitle: Text('친구 요청이 도착했습니다.'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
