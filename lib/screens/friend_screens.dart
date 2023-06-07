@@ -14,11 +14,11 @@ class FriendScreen extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         title: const Text('친구 목록'),
-        foregroundColor: Color.fromARGB(255, 159, 190, 248),
+        foregroundColor: const Color.fromARGB(255, 159, 190, 248),
         backgroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications),
             onPressed: () {
               showDialog(
                 context: context,
@@ -52,10 +52,12 @@ class FriendScreen extends StatelessWidget {
                                   requesterName: requesterName,
                                   requesterImageUrl: requesterImageUrl,
                                   acceptCallback: () {
-                                    _profileController.acceptFriendRequest(requesterId);
+                                    _profileController
+                                        .acceptFriendRequest(requesterId);
                                   },
                                   rejectCallback: () {
-                                    _profileController.rejectFriendRequest(requesterId);
+                                    _profileController
+                                        .rejectFriendRequest(requesterId);
                                   },
                                 );
                               },
@@ -87,15 +89,16 @@ class FriendScreen extends StatelessWidget {
                 String friendImageUrl = friends[index]['imageUrl'] ?? '';
 
                 return Card(
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: ListTile(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: ((context) => EventCalendar(
-                            friendUid: friends[index]['uid'],
-                          )),
+                                friendUid: friends[index]['uid'],
+                              )),
                         ),
                       );
                     },
@@ -105,12 +108,12 @@ class FriendScreen extends StatelessWidget {
                     ),
                     title: Text(
                       friendName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     trailing: IconButton(
-                      icon: Icon(Icons.delete),
+                      icon: const Icon(Icons.delete),
                       onPressed: () {
                         _profileController.deleteFriend(index);
                       },
@@ -123,40 +126,42 @@ class FriendScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-  child: Icon(Icons.add),
-  onPressed: () {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('친구 추가'),
-          content: TextField(
-            controller: _profileController.emailController,
-            decoration: InputDecoration(
-              labelText: '친구 이메일',
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text('취소'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text('추가'),
-              onPressed: () {
-                String friendEmail = _profileController.emailController.text;
-                _profileController.addFriendByEmail(friendEmail);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  },
-),
+        child: const Icon(Icons.add),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('친구 추가'),
+                content: TextField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _profileController.emailController,
+                  decoration: const InputDecoration(
+                    labelText: '친구 이메일',
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    child: const Text('취소'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('추가'),
+                    onPressed: () {
+                      String friendEmail =
+                          _profileController.emailController.text;
+                      _profileController.addFriendByEmail(friendEmail);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
@@ -169,6 +174,7 @@ class FriendRequestCard extends StatelessWidget {
   final VoidCallback rejectCallback;
 
   const FriendRequestCard({
+    super.key,
     required this.requesterId,
     required this.requesterName,
     required this.requesterImageUrl,
@@ -179,7 +185,7 @@ class FriendRequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: ListTile(
         leading: CircleAvatar(
           backgroundImage: NetworkImage(requesterImageUrl),
@@ -187,7 +193,7 @@ class FriendRequestCard extends StatelessWidget {
         ),
         title: Text(
           requesterName,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -195,11 +201,11 @@ class FriendRequestCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: Icon(Icons.check),
+              icon: const Icon(Icons.check),
               onPressed: acceptCallback,
             ),
             IconButton(
-              icon: Icon(Icons.close),
+              icon: const Icon(Icons.close),
               onPressed: rejectCallback,
             ),
           ],

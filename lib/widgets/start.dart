@@ -30,9 +30,9 @@ class Start extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: Image.asset('assets/images/main_todo.png'),
+            const Padding(
+              padding: EdgeInsets.only(top: 20.0),
+              // child: Image.asset('assets/images/main_todo.png'),
             ),
           ],
         ),

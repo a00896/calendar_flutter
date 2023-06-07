@@ -118,18 +118,19 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   }
 
   Future<void> saveCalendarData() async {
-    var user = FirebaseAuth.instance.currentUser;
-    final uid = user!.uid;
-    await FirebaseFirestore.instance.collection("users").doc(uid).update(
-      {
-        "calendars": '',
-      },
-    );
+    print("print: save 실행");
+    // var user = FirebaseAuth.instance.currentUser;
+    // final uid = user!.uid;
+    // await FirebaseFirestore.instance.collection("users").doc(uid).update(
+    //   {
+    //     "calendars": '',
+    //   },
+    // );
 
-    var response = await FirebaseFirestore.instance
-        .collection(collection_url)
-        // .where('data', isEqualTo: '2023-05-17')
-        .get();
+    // var response = await FirebaseFirestore.instance
+    //     .collection(collection_url)
+    //     // .where('data', isEqualTo: '2023-05-17')
+    //     .get();
     try {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       print('print:-------------------------------------------------------');
@@ -169,6 +170,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
               }
             }
           });
+          print("print: save 종료");
         }
         // 검색 결과에서 첫 번째 문서의 ID를 가져옴
         String documentID = querySnapshot.docs[0].id;
@@ -329,8 +331,8 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('every calendar'),
-        foregroundColor: Color.fromARGB(255, 154, 173, 255),
+        title: const Text('every calendar'),
+        foregroundColor: const Color.fromARGB(255, 154, 173, 255),
         backgroundColor: const Color.fromARGB(255, 247, 247, 247),
         elevation: 0,
         centerTitle: true,
@@ -385,7 +387,8 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                     print("print: 리스트타일 탭"),
                     setState(() {
                       myEvents['isChecked'] = !myEvents['isChecked'];
-                    })
+                    }),
+                    saveCalendarData(),
                   },
                   leading: Icon(
                     myEvents['isChecked']
