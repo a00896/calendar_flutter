@@ -21,7 +21,7 @@ class ProfileScreen extends StatelessWidget {
           'my page',
           style: TextStyle(fontSize: 26), // 원하는 텍스트 크기로 설정
         ),
-        foregroundColor: Color.fromARGB(255, 173, 218, 255),
+        foregroundColor: const Color.fromARGB(255, 191, 224, 255),
         backgroundColor: const Color.fromARGB(255, 247, 247, 247),
         elevation: 0,
         centerTitle: true,
@@ -46,7 +46,7 @@ class ProfileInfoSection extends GetWidget<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 250,
+      top: 170,
       left: 0,
       right: 230,
       child: SizedBox(
@@ -73,7 +73,7 @@ class ProfileImageSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Positioned(
-      top: 100,
+      top: 30,
       left: 0,
       right: 230,
       child: SizedBox(
@@ -120,7 +120,7 @@ class SettingButtonSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 100,
+      top: 20,
       right: 30,
       child: Column(
         children: [

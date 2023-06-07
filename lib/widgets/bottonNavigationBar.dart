@@ -62,28 +62,40 @@ class _BottomNavigationBarWidgetsState
                 showUnselectedLabels: false,
                 items: const <BottomNavigationBarItem>[
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
+                    icon: Icon(
+                      Icons.home,
+                      color: Color.fromARGB(255, 191, 224, 255),
+                    ),
                     label: '홈',
-                    backgroundColor: Color.fromARGB(255, 171, 216, 253),
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.search),
+                    icon: Icon(
+                      Icons.search,
+                      color: Color.fromARGB(255, 191, 224, 255),
+                    ),
                     label: '검색',
-                    backgroundColor: Color.fromARGB(255, 146, 206, 255),
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.bar_chart_rounded),
+                    icon: Icon(
+                      Icons.bar_chart_rounded,
+                      color: Color.fromARGB(255, 191, 224, 255),
+                    ),
                     label: '달성도',
-                    backgroundColor: Color.fromARGB(255, 149, 206, 253),
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
+                    icon: Icon(
+                      Icons.person,
+                      color: Color.fromARGB(255, 191, 224, 255),
+                    ),
                     label: '프로필',
-                    backgroundColor: Color.fromARGB(255, 155, 210, 255),
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
                   ),
                 ],
                 currentIndex: _selectedIndex,
-                selectedItemColor: Color.fromARGB(255, 61, 88, 241),
+                selectedItemColor: Color.fromARGB(255, 77, 87, 145),
                 onTap: _onItemTapped,
               ),
             );

@@ -110,7 +110,7 @@ class ProgressPageState extends State<ProgressPage> {
           'progress',
           style: TextStyle(fontSize: 26), // 원하는 텍스트 크기로 설정
         ),
-        foregroundColor: Color.fromARGB(255, 154, 198, 255),
+        foregroundColor: const Color.fromARGB(255, 191, 224, 255),
         backgroundColor: const Color.fromARGB(255, 247, 247, 247),
         elevation: 0, // 페이지 이름 'Progress'
         centerTitle: true, // 제목을 가운데 정렬(선택 사항)

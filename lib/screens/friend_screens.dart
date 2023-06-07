@@ -17,7 +17,7 @@ class FriendScreen extends StatelessWidget {
           'friend list',
           style: TextStyle(fontSize: 24),
         ),
-        foregroundColor: const Color.fromARGB(255, 159, 190, 248),
+        foregroundColor: const Color.fromARGB(255, 191, 224, 255),
         backgroundColor: Colors.white,
         centerTitle: true,
         actions: [

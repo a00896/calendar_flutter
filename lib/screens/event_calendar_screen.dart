@@ -470,7 +470,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
           'every calendar',
           style: TextStyle(fontSize: 26), // 원하는 텍스트 크기로 설정
         ),
-        foregroundColor: const Color.fromARGB(255, 154, 173, 255),
+        foregroundColor: Color.fromARGB(255, 191, 224, 255),
         backgroundColor: const Color.fromARGB(255, 247, 247, 247),
         elevation: 0,
         centerTitle: true,

@@ -30,7 +30,7 @@ class _SearchQueryState extends State<SearchQuery> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 248, 248, 248),
-        foregroundColor: Color.fromARGB(255, 165, 202, 243),
+        foregroundColor: Color.fromARGB(255, 191, 224, 255),
         title: Text('every calendar'), // 페이지 이름을 여기에 추가하세요.
         elevation: 0,
         bottom: PreferredSize(
