@@ -23,7 +23,7 @@ class Start extends StatelessWidget {
           children: [
             Gaps.v96,
             Text(
-              'every\ncalendar\n \u{1F499}',
+              'every\ncalendar\n ',
               style: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: 64,

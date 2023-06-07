@@ -19,7 +19,7 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'my page',
-          style: TextStyle(fontSize: 26), // 원하는 텍스트 크기로 설정
+          style: TextStyle(fontSize: 26),
         ),
         foregroundColor: const Color.fromARGB(255, 191, 224, 255),
         backgroundColor: const Color.fromARGB(255, 247, 247, 247),
@@ -32,8 +32,8 @@ class ProfileScreen extends StatelessWidget {
         children: [
           const ProfileInfoSection(),
           const ProfileImageSection(),
-          SettingButtonSection(
-              controller: controller), // ProfileController 인스턴스 전달
+          SettingButtonSection(controller: controller),
+          bucketListSection(), // ProfileController 인스턴스 전달
         ],
       ),
     );
@@ -161,7 +161,7 @@ class SettingButtonSection extends StatelessWidget {
               width: 70,
               height: 40,
               decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 250, 255, 206),
+                color: Color.fromARGB(255, 179, 218, 255),
               ),
               child: const Align(
                 alignment: Alignment.center,
@@ -171,6 +171,83 @@ class SettingButtonSection extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/*class BucketListItem {
+  final String title;
+  List<String> details;
+
+  BucketListItem({required this.title, required this.details});
+}*/
+
+Widget bucketListSection() {
+  return Positioned(
+    top: 220,
+    left: 20,
+    right: 20,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '버킷리스트',
+          style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 150, 150, 150)),
+        ),
+        SizedBox(height: 10),
+        BucketList(),
+      ],
+    ),
+  );
+}
+
+class BucketList extends StatefulWidget {
+  @override
+  _BucketListState createState() => _BucketListState();
+}
+
+class _BucketListState extends State<BucketList> {
+  List<String> bucketItems = [];
+
+  final TextEditingController itemController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: itemController,
+          decoration: InputDecoration(
+            labelText: '항목 추가',
+          ),
+          onSubmitted: (value) {
+            setState(() {
+              bucketItems.add(value);
+            });
+            itemController.clear();
+          },
+        ),
+        SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          children: bucketItems.map((item) => _buildBucketItem(item)).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBucketItem(String item) {
+    return Chip(
+      label: Text(item),
+      onDeleted: () {
+        setState(() {
+          bucketItems.remove(item);
+        });
+      },
     );
   }
 }

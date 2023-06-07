@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const List<String> list = <String>[
+  '',
   '일어나기',
   '밥 먹기',
   '과제 하기',
@@ -525,7 +526,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                     myEvents['isChecked']
                         ? Icons.check_box
                         : Icons.check_box_outline_blank,
-                    color: Colors.teal,
+                    color: const Color.fromARGB(255, 115, 224, 213),
                   ),
                   title: Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
