@@ -466,7 +466,10 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('every calendar'),
+        title: const Text(
+          'every calendar',
+          style: TextStyle(fontSize: 26), // 원하는 텍스트 크기로 설정
+        ),
         foregroundColor: const Color.fromARGB(255, 154, 173, 255),
         backgroundColor: const Color.fromARGB(255, 247, 247, 247),
         elevation: 0,
@@ -574,7 +577,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
                     },
                     icon: const Icon(
                       Icons.delete,
-                      color: Colors.red,
+                      color: Color.fromARGB(255, 165, 165, 165),
                     ),
                   ),
                 ),
@@ -585,7 +588,7 @@ class _EventCalendarScreenState extends State<EventCalendarScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEventDialog(),
-        label: const Text('일정 추가'),
+        label: const Text('일정 추가 \u{2728}'),
       ),
     );
   }

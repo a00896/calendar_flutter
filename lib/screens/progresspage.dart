@@ -95,8 +95,9 @@ class ProgressPageState extends State<ProgressPage> {
     });
   }
 
-  int countCheckedEvents(List events) {
-    return events.where((event) => event['isChecked'] == true).length;
+  List<Map<String, dynamic>> countCheckedEvents(
+      List<Map<String, dynamic>> events) {
+    return events.where((event) => event['isChecked'] == true).toList();
   }
 
   @override
@@ -131,8 +132,12 @@ class ProgressPageState extends State<ProgressPage> {
                 itemBuilder: (context, index) {
                   var date = mySelectedEvents.keys.elementAt(index);
                   var events = mySelectedEvents[date];
-                  var trueCount = countCheckedEvents(events!);
-                  var progress = trueCount / events.length;
+                  var checkedEvents =
+                      countCheckedEvents(events!.cast<Map<String, dynamic>>());
+                  var progressText = checkedEvents.length == events.length
+                      ? '모든 일정 완료 \u{1F389}'
+                      : '완료한 갯수: ${checkedEvents.length}';
+                  var progress = checkedEvents.length / events.length;
 
                   return Card(
                     shape: RoundedRectangleBorder(
@@ -153,7 +158,7 @@ class ProgressPageState extends State<ProgressPage> {
                             name: 'Progress',
                           ),
                           Text(
-                            '완료한 갯수: $trueCount',
+                            progressText,
                             style: TextStyle(fontSize: 16),
                           ),
                         ],

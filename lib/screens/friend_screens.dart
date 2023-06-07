@@ -13,9 +13,13 @@ class FriendScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: const Text('친구 목록'),
+        title: const Text(
+          'friend list',
+          style: TextStyle(fontSize: 24),
+        ),
         foregroundColor: const Color.fromARGB(255, 159, 190, 248),
         backgroundColor: Colors.white,
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
@@ -79,7 +83,10 @@ class FriendScreen extends StatelessWidget {
               _profileController.friendData;
           if (friends.isEmpty) {
             return const Center(
-              child: Text('친구가 없습니다.'),
+              child: Text(
+                '친구가 없습니다 \u{1F625}\n아래의 + 버튼을 눌러\n친구를 추가해보세요 \u{1F498}',
+                style: TextStyle(fontSize: 17),
+              ),
             );
           } else {
             return ListView.builder(
